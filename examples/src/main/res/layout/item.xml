@@ -35,7 +35,7 @@
         android:layout_height="match_parent"
         android:background="@drawable/item_background"
         android:gravity="center"
-        android:textColor="#999999"
+        android:textColor="#333999"
         android:textSize="22sp"
         android:textStyle="bold"/>
 </FrameLayout>

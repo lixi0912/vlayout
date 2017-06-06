@@ -54,6 +54,7 @@
         <activity android:name="com.alibaba.android.vlayout.example.VLayoutActivity">
 
         </activity>
+        <activity android:name="realmtest.RealmDemoActivity" />
 
     </application>
 

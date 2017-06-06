@@ -443,7 +443,7 @@ public class OnePlusNLayoutActivity extends Activity {
     }
 
 
-    static class MainViewHolder extends RecyclerView.ViewHolder {
+    public static class MainViewHolder extends RecyclerView.ViewHolder {
 
         public static volatile int existing = 0;
         public static int createdTimes = 0;

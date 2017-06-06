@@ -75,7 +75,7 @@ public class MainActivity extends Activity {
         gridLayoutHelper.setItemCount(25);
 
 
-        final ScrollFixLayoutHelper scrollFixLayoutHelper = new ScrollFixLayoutHelper(FixLayoutHelper.TOP_RIGHT, 100, 100);
+        final ScrollFixLayoutHelper scrollFixLayoutHelper = new ScrollFixLayoutHelper(FixLayoutHelper.TOP_RIGHT, 300, 300);
 
         helpers.add(DefaultLayoutHelper.newHelper(7));
         helpers.add(scrollFixLayoutHelper);
