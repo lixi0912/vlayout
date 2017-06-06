@@ -105,7 +105,7 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
         if (mHasConsistItemType) {
             Adapter adapter = mItemTypeAry.get(viewType);
             if (adapter != null) {
-                 return adapter.onCreateViewHolder(parent, viewType);
+                return adapter.onCreateViewHolder(parent, viewType);
             }
 
             return null;
@@ -119,7 +119,7 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
         int index = viewType - t;
         int subItemType = w - index;
 
-        Adapter adapter  = findAdapterByIndex(index);
+        Adapter adapter = findAdapterByIndex(index);
         if (adapter == null) {
             return null;
         }
@@ -243,6 +243,23 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
         }
     }
 
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        for (Pair<AdapterDataObserver, Adapter> pair : mAdapters) {
+            Adapter theOrigin = pair.second;
+            theOrigin.onAttachedToRecyclerView(recyclerView);
+        }
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        for (Pair<AdapterDataObserver, Adapter> pair : mAdapters) {
+            Adapter theOrigin = pair.second;
+            theOrigin.onDetachedFromRecyclerView(recyclerView);
+        }
+    }
 
     /**
      * You can not set layoutHelpers to delegate adapter
@@ -456,7 +473,18 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
         return rs.second;
     }
 
-    protected class AdapterDataObserver extends RecyclerView.AdapterDataObserver {
+    /**
+     * @return the index of list (may from Sub-Adapter) or -1 if the viewHolder was not found
+     */
+    public int itemIndexOf(RecyclerView.ViewHolder viewHolder) {
+        final int adapterPos = viewHolder.getAdapterPosition();
+        Pair<DelegateAdapter.AdapterDataObserver, DelegateAdapter.Adapter> pair
+                = findAdapterByPosition(adapterPos);
+        // index
+        return null != pair ? adapterPos - pair.first.mStartPosition : -1;
+    }
+
+    class AdapterDataObserver extends RecyclerView.AdapterDataObserver {
         int mStartPosition;
 
         int mIndex = -1;
@@ -471,7 +499,7 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
             this.mIndex = index;
         }
 
-        private boolean updateLayoutHelper(){
+        private boolean updateLayoutHelper() {
             if (mIndex < 0) {
                 return false;
             }
