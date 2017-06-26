@@ -20,7 +20,7 @@ public class Book extends RealmObject implements IPrinter {
 
     @Override
     public String print(int position) {
-        return String.format(Locale.getDefault(), "Book:%1$d,listIndex:%2$d", id, position);
+        return String.format(Locale.getDefault(), "Book:%1$d,listIndex:%2$d,sortedIndex:%3$d", id, position, index);
     }
 
     public static void add(Realm realm) {

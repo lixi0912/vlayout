@@ -473,11 +473,26 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
         return rs.second;
     }
 
+
+    public boolean inRange(int originAdapterPos, int targetAdapterPos) {
+        Pair<DelegateAdapter.AdapterDataObserver, DelegateAdapter.Adapter> originPair =
+                findAdapterByPosition(originAdapterPos);
+        if (null == originPair)
+            return false;
+        Range<Integer> range = Range.create(originPair.first.mStartPosition,
+                originPair.first.mStartPosition
+                        + originPair.second.getItemCount());
+        return range.contains(targetAdapterPos);
+    }
+
     /**
      * @return the index of list (may from Sub-Adapter) or -1 if the viewHolder was not found
      */
     public int itemIndexOf(RecyclerView.ViewHolder viewHolder) {
-        final int adapterPos = viewHolder.getAdapterPosition();
+        return itemIndexOfAdapterPosition(viewHolder.getAdapterPosition());
+    }
+
+    public int itemIndexOfAdapterPosition(int adapterPos) {
         Pair<DelegateAdapter.AdapterDataObserver, DelegateAdapter.Adapter> pair
                 = findAdapterByPosition(adapterPos);
         // index

@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,7 +51,7 @@ public class RealmDemoActivity extends Activity implements View.OnClickListener 
         VirtualLayoutManager layoutManager = new VirtualLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        RealmResults<Book> books = realm.where(Book.class).findAllSorted("id");
+        RealmResults<Book> books = realm.where(Book.class).findAllSorted("index");
         Adapter<Book> bookAdapter = new Adapter<>(books, true, new StaggeredGridLayoutHelper(), realm);
 
 
@@ -58,8 +59,8 @@ public class RealmDemoActivity extends Activity implements View.OnClickListener 
         Adapter<Toy> toyAdapter = new Adapter<>(toys, true, new LinearLayoutHelper(), realm);
 
 
-        List<DelegateAdapter.Adapter> adapters = new LinkedList<>();
-        adapters.add(new StickyTitleAdapter("Book"));
+        final List<DelegateAdapter.Adapter> adapters = new LinkedList<>();
+//        adapters.add(new StickyTitleAdapter("Book"));
         adapters.add(bookAdapter);
         adapters.add(new StickyTitleAdapter("Toy"));
         adapters.add(toyAdapter);
@@ -78,21 +79,28 @@ public class RealmDemoActivity extends Activity implements View.OnClickListener 
 
                         int originPos = viewHolder.getAdapterPosition();
                         int targetPos = target.getAdapterPosition();
+                        if (delegateAdapter.inRange(originPos, targetPos)) {
+                            Pair<?, DelegateAdapter.Adapter> pair = delegateAdapter.findAdapterByPosition(originPos);
+                            if (null != pair) {
+                                int index = delegateAdapter.itemIndexOfAdapterPosition(originPos);
+                                DelegateAdapter.Adapter adapter = pair.second;
 
-
-
-
+                            }
+                        }
                         return false;
                     }
 
                     @Override
                     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                        int itemPos = delegateAdapter.itemIndexOf(viewHolder);
-                        Log.d(TAG, "itemPos:" + itemPos);
+                        int pos = viewHolder.getAdapterPosition();
+
+                        int itemIndex = delegateAdapter.itemIndexOf(viewHolder);
+                        Log.d(TAG, "itemIndex:" + itemIndex);
 
 
                     }
                 });
+
         itemTouchHelper.attachToRecyclerView(recyclerView);
         recyclerView.addOnChildAttachStateChangeListener(itemTouchHelper);
     }
