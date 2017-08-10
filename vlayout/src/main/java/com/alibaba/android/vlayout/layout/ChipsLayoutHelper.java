@@ -63,7 +63,6 @@ public class ChipsLayoutHelper extends BaseLayoutHelper {
         OrientationHelper orientationHelper = helper.getMainOrientationHelper();
 
         if (layoutInVertical) {
-            final int defaultNewViewLine = layoutState.getOffset();
             Span span = first;
             span.clear();
             while (layoutState.hasMore(state) && !isOutOfRange(layoutState.getCurrentPosition())) {
@@ -102,6 +101,7 @@ public class ChipsLayoutHelper extends BaseLayoutHelper {
             }
             // add last line
             span.totalSpacing = maxSize - span.usedWidth;
+            final int defaultNewViewLine = layoutState.getOffset();
             layoutVerticalChild(helper, orientationHelper, result, defaultNewViewLine, hGap, vGap);
         } else {
             // TODO
@@ -111,7 +111,7 @@ public class ChipsLayoutHelper extends BaseLayoutHelper {
     private void layoutVerticalChild(LayoutManagerHelper helper, OrientationHelper orientationHelper,
                                      LayoutChunkResult result, int defaultNewViewLine, int hGap, int vGap) {
         int top = helper.getPaddingTop() + mMarginTop + mPaddingTop + defaultNewViewLine;
-        int bottom;
+        int bottom = 0;
 
         final int defaultLeft = helper.getPaddingLeft() + mMarginLeft + mPaddingLeft;
         int left = defaultLeft;
@@ -141,6 +141,8 @@ public class ChipsLayoutHelper extends BaseLayoutHelper {
             left = defaultLeft;
             span = span.next;
         }
+
+        result.mConsumed = bottom;
     }
 
     @Override
