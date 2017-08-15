@@ -178,10 +178,24 @@ public class LinearLayoutHelper extends BaseLayoutHelper {
         // To calculate correct layout position, we subtract margins.
         layoutChild(view, left, top, right, bottom, helper);
 
+
         if (DEBUG) {
-            Log.d(TAG, "laid out child at position " + helper.getPosition(view) + ", with l:"
-                    + (left + params.leftMargin) + ", t:" + (top + params.topMargin) + ", r:"
-                    + (right - params.rightMargin) + ", b:" + (bottom - params.bottomMargin));
+
+            int spec = layoutState.getLayoutDirection()
+                    == VirtualLayoutManager.LayoutStateWrapper.LAYOUT_START
+                    ? -startSpace - (isStartLine ? 0 : mDividerHeight)
+                    : startSpace + (isStartLine ? 0 : mDividerHeight);
+
+            Log.d(TAG, "laid out child " + view + " at position " + helper.getPosition(view)
+                    + ", with l:" + (left + params.leftMargin)
+                    + ", t:" + (top + params.topMargin)
+                    + ", r:" + (right - params.rightMargin)
+                    + ", b:" + (bottom - params.bottomMargin)
+                    + ",h:" + (bottom - top)
+                    + ",offset:" + layoutState.getOffset()
+                    + ",spec:" + spec
+                    + ",consumed:" + result.mConsumed
+            );
         }
 
         handleStateOnResult(result, view);

@@ -182,6 +182,23 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
     }
 
 
+    public static int encodeViewType(DelegateAdapter adapter, int viewType, int index) {
+        if (adapter.mHasConsistItemType) {
+            return viewType;
+        }
+
+        return (int) getCantor(viewType, index);
+    }
+
+    public static int decodeViewType(int viewType) {
+        int w = (int) (Math.floor(Math.sqrt(8 * viewType + 1) - 1) / 2);
+        int t = (w * w + w) / 2;
+
+        int index = viewType - t;
+        return w - index;
+    }
+
+
     @Override
     public long getItemId(int position) {
         Pair<AdapterDataObserver, Adapter> p = findAdapterByPosition(position);
@@ -476,9 +493,15 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
 
     public Adapter findAdapterByIndex(int index) {
         Pair<AdapterDataObserver, Adapter> rs = mIndexAry.get(index);
-        return rs.second;
+        return null == rs ? null : rs.second;
     }
 
+
+    public Range<Integer> rangeByIndex(int adapterIndex) {
+        Pair<AdapterDataObserver, Adapter> rs = mIndexAry.get(adapterIndex);
+        return Range.create(rs.first.mStartPosition, rs.first.mStartPosition
+                + rs.second.getItemCount());
+    }
 
     public boolean inRange(int originAdapterPos, int targetAdapterPos) {
         Pair<DelegateAdapter.AdapterDataObserver, DelegateAdapter.Adapter> originPair =
