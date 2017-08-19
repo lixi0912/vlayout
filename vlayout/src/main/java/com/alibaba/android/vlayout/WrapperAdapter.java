@@ -4,9 +4,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
-import com.alibaba.android.vlayout.DelegateAdapter;
-import com.alibaba.android.vlayout.LayoutHelper;
-
 import java.util.List;
 
 /**
@@ -47,11 +44,13 @@ public class WrapperAdapter<VH extends RecyclerView.ViewHolder> extends Delegate
 
     @Override
     public void registerAdapterDataObserver(RecyclerView.AdapterDataObserver observer) {
+        super.registerAdapterDataObserver(observer);
         delegate.registerAdapterDataObserver(observer);
     }
 
     @Override
     public void unregisterAdapterDataObserver(RecyclerView.AdapterDataObserver observer) {
+        super.unregisterAdapterDataObserver(observer);
         delegate.unregisterAdapterDataObserver(observer);
     }
 
