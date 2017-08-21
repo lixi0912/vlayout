@@ -1,10 +1,10 @@
 package com.alibaba.android.vlayout.layout;
 
-import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.alibaba.android.vlayout.LayoutManagerHelper;
+import com.alibaba.android.vlayout.OrientationHelperEx;
 import com.alibaba.android.vlayout.VirtualLayoutManager;
 
 import java.util.ArrayList;
@@ -60,7 +60,7 @@ public class ChipsLayoutHelper extends BaseLayoutHelper {
         int hGap = this.mHGap;
         int vGap = this.mVGap;
 
-        OrientationHelper orientationHelper = helper.getMainOrientationHelper();
+        OrientationHelperEx orientationHelper = helper.getMainOrientationHelper();
 
         if (layoutInVertical) {
             Span span = first;
@@ -108,7 +108,7 @@ public class ChipsLayoutHelper extends BaseLayoutHelper {
         }
     }
 
-    private void layoutVerticalChild(LayoutManagerHelper helper, OrientationHelper orientationHelper,
+    private void layoutVerticalChild(LayoutManagerHelper helper, OrientationHelperEx orientationHelper,
                                      LayoutChunkResult result, int defaultNewViewLine, int hGap, int vGap) {
         int top = helper.getPaddingTop() + mMarginTop + mPaddingTop + defaultNewViewLine;
         int bottom = 0;
