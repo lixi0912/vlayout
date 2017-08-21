@@ -3,6 +3,7 @@ package com.alibaba.android.vlayout.layout;
 import java.lang.reflect.Array;
 
 import com.alibaba.android.vlayout.LayoutManagerHelper;
+import com.alibaba.android.vlayout.OrientationHelperEx;
 import com.alibaba.android.vlayout.Range;
 import com.alibaba.android.vlayout.VirtualLayoutManager;
 import com.alibaba.android.vlayout.layout.BaseLayoutHelper.DefaultLayoutViewHelper;
@@ -13,6 +14,7 @@ import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
 import android.support.v4.util.SimpleArrayMap;
+import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -439,21 +441,12 @@ public class RangeStyle<T extends RangeStyle> {
                 if (isValidScrolled(scrolled)) {
                     if (helper.getOrientation() == VirtualLayoutManager.VERTICAL) {
                         mLayoutRegion.offset(0, -scrolled);
-                    }
-                    else {
+                    } else {
                         mLayoutRegion.offset(-scrolled, 0);
                     }
                 }
 
-                if (!isChildrenEmpty()) {
-                    for (int i = 0, size = mChildren.size(); i < size; i++) {
-                        RangeStyle rangeStyle = mChildren.valueAt(i);
-                        if (rangeStyle.mLayoutView != null) {
-                            mLayoutRegion.union(rangeStyle.mLayoutView.getLeft(), rangeStyle.mLayoutView.getTop(),
-                                rangeStyle.mLayoutView.getRight(), rangeStyle.mLayoutView.getBottom());
-                        }
-                    }
-                }
+                unionChildRegion(this);
 
                 int contentWidth = helper.getContentWidth();
                 int contentHeight = helper.getContentHeight();
@@ -489,26 +482,105 @@ public class RangeStyle<T extends RangeStyle> {
             }
         }
         hideLayoutViews(helper);
+        if (isRoot()) {
+            removeChildViews(helper, this);
+        }
+    }
 
-        if (mLayoutView != null) {
-            if (mLayoutViewUnBindListener != null) {
-                mLayoutViewUnBindListener.onUnbind(mLayoutView, getLayoutHelper());
+    private void unionChildRegion(RangeStyle<T> rangeStyle) {
+        if (!rangeStyle.isChildrenEmpty()) {
+            for (int i = 0, size = rangeStyle.mChildren.size(); i < size; i++) {
+                RangeStyle childRangeStyle = rangeStyle.mChildren.valueAt(i);
+                unionChildRegion(childRangeStyle);
+                if (childRangeStyle.mLayoutView != null) {
+                    rangeStyle.mLayoutRegion.union(childRangeStyle.mLayoutView.getLeft(), childRangeStyle.mLayoutView.getTop(),
+                            childRangeStyle.mLayoutView.getRight(), childRangeStyle.mLayoutView.getBottom());
+                }
             }
-            helper.removeChildView(mLayoutView);
-            mLayoutView = null;
+        }
+    }
+
+    private void removeChildViews(LayoutManagerHelper helper, RangeStyle<T> rangeStyle) {
+        if (!rangeStyle.isChildrenEmpty()) {
+            for (int i = 0, size = rangeStyle.mChildren.size(); i < size; i++) {
+                RangeStyle childRangeStyle = rangeStyle.mChildren.valueAt(i);
+                removeChildViews(helper, childRangeStyle);
+            }
+        }
+
+        if (rangeStyle.mLayoutView != null) {
+            if (rangeStyle.mLayoutViewUnBindListener != null) {
+                rangeStyle.mLayoutViewUnBindListener.onUnbind(rangeStyle.mLayoutView, getLayoutHelper());
+            }
+            helper.removeChildView(rangeStyle.mLayoutView);
+            rangeStyle.mLayoutView = null;
+        }
+    }
+
+    public void adjustLayout(int startPosition, int endPosition, LayoutManagerHelper helper) {
+        if (!isChildrenEmpty()) {
+            for (int i = 0, size = mChildren.size(); i < size; i++) {
+                RangeStyle rangeStyle = mChildren.valueAt(i);
+                rangeStyle.adjustLayout(startPosition, endPosition, helper);
+            }
+        }
+        if (requireLayoutView()) {
+            View refer = null;
+            Rect tempRect = new Rect();
+            final OrientationHelperEx orientationHelper = helper.getMainOrientationHelper();
+            for (int i = 0; i < helper.getChildCount(); i++) {
+                refer = helper.getChildAt(i);
+                int anchorPos = helper.getPosition(refer);
+                if (getRange().contains(anchorPos)) {
+                    if (refer.getVisibility() == View.GONE) {
+                        tempRect.setEmpty();
+                    } else {
+                        final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams)
+                            refer.getLayoutParams();
+                        if (helper.getOrientation() == VirtualLayoutManager.VERTICAL) {
+                            tempRect.union(helper.getDecoratedLeft(refer) - params.leftMargin,
+                                orientationHelper.getDecoratedStart(refer),
+                                helper.getDecoratedRight(refer) + params.rightMargin,
+                                orientationHelper.getDecoratedEnd(refer));
+                        } else {
+                            tempRect.union(orientationHelper.getDecoratedStart(refer),
+                                helper.getDecoratedTop(refer) - params.topMargin, orientationHelper.getDecoratedEnd(refer),
+                                helper.getDecoratedBottom(refer) + params.bottomMargin);
+                        }
+                    }
+                }
+            }
+            if (!tempRect.isEmpty()) {
+                mLayoutRegion.set(tempRect.left - mPaddingLeft, tempRect.top - mPaddingTop,
+                    tempRect.right + mPaddingRight, tempRect.bottom + mPaddingBottom);
+            } else {
+                mLayoutRegion.setEmpty();
+            }
+            if (mLayoutView != null) {
+                mLayoutView.layout(mLayoutRegion.left, mLayoutRegion.top, mLayoutRegion.right, mLayoutRegion.bottom);
+            }
         }
     }
 
     private void hideLayoutViews(LayoutManagerHelper helper) {
         if (isRoot()) {
+            hideChildLayoutViews(helper, this);
+
             if (mLayoutView != null) {
                 helper.hideView(mLayoutView);
             }
-            for (int i = 0, size = mChildren.size(); i < size; i++) {
-                RangeStyle rangeStyle = mChildren.valueAt(i);
-                if (rangeStyle.mLayoutView != null) {
-                    helper.hideView(rangeStyle.mLayoutView);
-                }
+        }
+    }
+
+    private void hideChildLayoutViews(LayoutManagerHelper helper, RangeStyle<T> rangeStyle) {
+        for (int i = 0, size = rangeStyle.mChildren.size(); i < size; i++) {
+            RangeStyle childRangeStyle = rangeStyle.mChildren.valueAt(i);
+            if (!childRangeStyle.isChildrenEmpty()) {
+                hideChildLayoutViews(helper, childRangeStyle);
+            }
+
+            if (childRangeStyle.mLayoutView != null) {
+                helper.hideView(childRangeStyle.mLayoutView);
             }
         }
     }
@@ -516,9 +588,20 @@ public class RangeStyle<T extends RangeStyle> {
     public boolean requireLayoutView() {
         boolean self = mBgColor != 0 || mLayoutViewBindListener != null;
         if (!isChildrenEmpty()) {
-            for (int i = 0, size = mChildren.size(); i < size; i++) {
-                RangeStyle rangeStyle = mChildren.valueAt(i);
-                self |= rangeStyle.requireLayoutView();
+            self |= requireChildLayoutView(this);
+        }
+        return self;
+    }
+
+    private boolean requireChildLayoutView(RangeStyle<T> rangeStyle) {
+        boolean self = rangeStyle.mBgColor != 0 || rangeStyle.mLayoutViewBindListener != null;
+
+        for (int i = 0, size = rangeStyle.mChildren.size(); i < size; i++) {
+            RangeStyle childRangeStyle = rangeStyle.mChildren.valueAt(i);
+            if (!childRangeStyle.isChildrenEmpty()) {
+                self |= requireChildLayoutView(childRangeStyle);
+            } else {
+                return childRangeStyle.requireLayoutView();
             }
         }
         return self;
@@ -557,16 +640,25 @@ public class RangeStyle<T extends RangeStyle> {
     }
 
     public void onClear(LayoutManagerHelper helper) {
-        if (mLayoutView != null) {
-            if (mLayoutViewUnBindListener != null) {
-                mLayoutViewUnBindListener.onUnbind(mLayoutView, getLayoutHelper());
+        clearChild(helper, this);
+    }
+
+    private void clearChild(LayoutManagerHelper helper, RangeStyle<T> rangeStyle) {
+        if (rangeStyle.mLayoutView != null) {
+            if (rangeStyle.mLayoutViewUnBindListener != null) {
+                rangeStyle.mLayoutViewUnBindListener.onUnbind(rangeStyle.mLayoutView, getLayoutHelper());
             }
-            helper.removeChildView(mLayoutView);
-            mLayoutView = null;
+            helper.removeChildView(rangeStyle.mLayoutView);
+            rangeStyle.mLayoutView = null;
         }
-        for (int i = 0, size = mChildren.size(); i < size; i++) {
-            T rangeStyle = mChildren.valueAt(i);
-            rangeStyle.onClear(helper);
+
+        if (rangeStyle.mChildren.isEmpty()) {
+            return;
+        }
+
+        for (int i = 0, size = rangeStyle.mChildren.size(); i < size; i++) {
+            RangeStyle childRangeStyle = rangeStyle.mChildren.valueAt(i);
+            clearChild(helper, childRangeStyle);
         }
     }
 
@@ -575,7 +667,7 @@ public class RangeStyle<T extends RangeStyle> {
     }
 
     public void layoutChild(final View child, int left, int top, int right, int bottom, @NonNull LayoutManagerHelper helper, boolean addLayoutRegionWithMargin) {
-        helper.layoutChild(child, left, top, right, bottom);
+        helper.layoutChildWithMargins(child, left, top, right, bottom);
         fillLayoutRegion(left, top, right, bottom, addLayoutRegionWithMargin);
     }
 

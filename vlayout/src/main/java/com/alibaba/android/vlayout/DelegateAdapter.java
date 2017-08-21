@@ -454,6 +454,23 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
         mIndexAry.clear();
     }
 
+    public int getAdaptersCount(){
+        return mAdapters == null ? 0 : mAdapters.size();
+    }
+    
+    /**
+     *
+     * @param absoultePosition
+     * @return the relative position in sub adapter by the absoulte position in DelegaterAdapter. Return -1 if no sub adapter founded.
+     */
+    public int findOffsetPosition(int absoultePosition) {
+        Pair<AdapterDataObserver, Adapter> p = findAdapterByPosition(absoultePosition);
+        if (p == null) {
+            return -1;
+        }
+        int subAdapterPosition = absoultePosition - p.first.mStartPosition;
+        return subAdapterPosition;
+    }
 
     @Nullable
     public Pair<AdapterDataObserver, Adapter> findAdapterByPosition(int position) {
@@ -514,19 +531,7 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
         return range.contains(targetAdapterPos);
     }
 
-    /**
-     * @return the index of list (may from Sub-Adapter) or -1 if the viewHolder was not found
-     */
-    public int itemIndexOf(RecyclerView.ViewHolder viewHolder) {
-        return itemIndexOfAdapterPosition(viewHolder.getAdapterPosition());
-    }
-
-    public int itemIndexOfAdapterPosition(int adapterPos) {
-        Pair<DelegateAdapter.AdapterDataObserver, DelegateAdapter.Adapter> pair
-                = findAdapterByPosition(adapterPos);
-        // index
-        return null != pair ? adapterPos - pair.first.mStartPosition : -1;
-    }
+   
 
     class AdapterDataObserver extends RecyclerView.AdapterDataObserver {
         int mStartPosition;
@@ -543,7 +548,15 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
             this.mIndex = index;
         }
 
-        private boolean updateLayoutHelper() {
+        public int getStartPosition() {
+            return mStartPosition;
+        }
+
+        public int getIndex() {
+            return mIndex;
+        }
+
+        private boolean updateLayoutHelper(){
             if (mIndex < 0) {
                 return false;
             }
