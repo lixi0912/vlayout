@@ -181,6 +181,9 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
         return (int) getCantor(subItemType, index);
     }
 
+    public static int encodeViewType(int viewType, int index) {
+        return (int) getCantor(viewType, index);
+    }
 
     public static int encodeViewType(DelegateAdapter adapter, int viewType, int index) {
         if (adapter.mHasConsistItemType) {
@@ -454,10 +457,10 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
         mIndexAry.clear();
     }
 
-    public int getAdaptersCount(){
+    public int getAdaptersCount() {
         return mAdapters == null ? 0 : mAdapters.size();
     }
-    
+
     /**
      *
      * @param absoultePosition
@@ -531,7 +534,7 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
         return range.contains(targetAdapterPos);
     }
 
-   
+
 
     class AdapterDataObserver extends RecyclerView.AdapterDataObserver {
         int mStartPosition;
@@ -556,7 +559,7 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
             return mIndex;
         }
 
-        private boolean updateLayoutHelper(){
+        private boolean updateLayoutHelper() {
             if (mIndex < 0) {
                 return false;
             }
