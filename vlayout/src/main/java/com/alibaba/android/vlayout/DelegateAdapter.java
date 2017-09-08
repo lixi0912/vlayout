@@ -260,7 +260,7 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
     @Override
     public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder) {
         super.onViewDetachedFromWindow(holder);
-        int position = holder.getPosition();
+        int position = holder.getAdapterPosition();
         if (position > 0) {
             Pair<AdapterDataObserver, Adapter> pair = findAdapterByPosition(position);
             if (pair != null) {
@@ -587,7 +587,7 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
                 }
 
                 // set helpers to refresh range
-                DelegateAdapter.super.setLayoutHelpers(helpers);
+                 DelegateAdapter.super.setLayoutHelpers(helpers);
             }
             return true;
         }
