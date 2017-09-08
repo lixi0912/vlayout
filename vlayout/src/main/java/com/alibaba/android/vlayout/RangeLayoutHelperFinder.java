@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 /**
-  An implement of {@link LayoutHelperFinder} which finds layoutHelpers by position
+ * An implement of {@link LayoutHelperFinder} which finds layoutHelpers by position
  */
 public class RangeLayoutHelperFinder extends LayoutHelperFinder {
 
@@ -131,7 +131,7 @@ public class RangeLayoutHelperFinder extends LayoutHelperFinder {
             rs = mLayoutHelperItems.get(m);
             if (rs.getStartPosition() > position) {
                 e = m - 1;
-            } else if (rs.getEndPosition() < position) {
+            } else if (rs.getEndPosition() < position || rs.getStartPosition() == rs.getEndPosition()) {
                 s = m + 1;
             } else if (rs.getStartPosition() <= position && rs.getEndPosition() >= position)
                 break;
