@@ -14,11 +14,28 @@ import android.widget.LinearLayout;
 import java.util.Arrays;
 
 /**
+ * <pre>
+ * TypeDividerDecoration decoration = TypeDividerDecoration.multiAble(this,
+ * TypeDividerDecoration.VERTICAL);
+ * decoration.setMarginStart(margin);
+ * decoration.setMarginEnd(margin);
+ *
+ * // post item decoration - showDividers = middle
+ * decoration.registerType(
+ *     DelegateAdapter.encodeViewType(0, postIndex),
+ *     DelegateAdapter.encodeViewType(1, postIndex),
+ *     DelegateAdapter.encodeViewType(2, postIndex),
+ *     DelegateAdapter.encodeViewType(3, postIndex)
+ * );
+ *
+ * // top item decoration - showDividers = middle
+ * decorationEx.registerType(DelegateAdapter.encodeViewType(0, topIndex));
+ * </pre>
+ *
  * @author 陈晓辉
  * @description <>
  * @date 2017/9/5
  */
-
 public class TypeDividerDecoration extends RecyclerView.ItemDecoration {
 
     public static final int HORIZONTAL = LinearLayout.HORIZONTAL;
