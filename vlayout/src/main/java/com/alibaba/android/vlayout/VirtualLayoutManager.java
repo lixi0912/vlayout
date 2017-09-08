@@ -57,7 +57,7 @@ import java.util.Map;
 /**
  * A {@link android.support.v7.widget.RecyclerView.LayoutManager} implementation which provides
  * a virtual layout for actual views.
- *
+ * <p>
  * NOTE: it will change {@link android.support.v7.widget.RecyclerView.RecycledViewPool}
  * for RecyclerView.
  *
@@ -206,7 +206,7 @@ public class VirtualLayoutManager extends ExposeLinearLayoutManagerEx implements
                 if (helper.getItemCount() > 0) {
                     helper.setRange(start, start + helper.getItemCount() - 1);
                 } else {
-                    helper.setRange(-1, -1);
+                    helper.setRange(start, start);
                 }
 
                 start += helper.getItemCount();
@@ -1306,7 +1306,7 @@ public class VirtualLayoutManager extends ExposeLinearLayoutManagerEx implements
             RecyclerView.ViewHolder holder = getChildViewHolder(v);
             if (holder instanceof CacheViewHolder && ((CacheViewHolder) holder).needCached()) {
                 // mark not invalid, ignore DataSetChange(), make the ViewHolder itself to maitain the data
-                ViewHolderWrapper.setFlags(holder, 0, FLAG_INVALID |FLAG_UPDATED);
+                ViewHolderWrapper.setFlags(holder, 0, FLAG_INVALID | FLAG_UPDATED);
             }
         }
 

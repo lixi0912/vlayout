@@ -56,7 +56,8 @@ public class RangeLayoutHelperFinder extends LayoutHelperFinder {
     private Comparator<LayoutHelper> mLayoutHelperComparator = new Comparator<LayoutHelper>() {
         @Override
         public int compare(LayoutHelper lhs, LayoutHelper rhs) {
-            return lhs.getRange().getLower().intValue() - rhs.getRange().getLower().intValue();
+//            return lhs.getZIndex() - rhs.getZIndex();
+            return lhs.getRange().getLower() - rhs.getRange().getLower();
         }
     };
 
