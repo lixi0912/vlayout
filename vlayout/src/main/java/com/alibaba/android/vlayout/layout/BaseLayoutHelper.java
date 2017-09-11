@@ -24,19 +24,19 @@
 
 package com.alibaba.android.vlayout.layout;
 
-import com.alibaba.android.vlayout.LayoutHelper;
-import com.alibaba.android.vlayout.LayoutManagerHelper;
-import com.alibaba.android.vlayout.OrientationHelperEx;
-import com.alibaba.android.vlayout.R;
-import com.alibaba.android.vlayout.VirtualLayoutManager;
-import com.alibaba.android.vlayout.VirtualLayoutManager.LayoutStateWrapper;
-
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+
+import com.alibaba.android.vlayout.LayoutHelper;
+import com.alibaba.android.vlayout.LayoutManagerHelper;
+import com.alibaba.android.vlayout.OrientationHelperEx;
+import com.alibaba.android.vlayout.R;
+import com.alibaba.android.vlayout.VirtualLayoutManager;
+import com.alibaba.android.vlayout.VirtualLayoutManager.LayoutStateWrapper;
 
 /**
  * {@link com.alibaba.android.vlayout.LayoutHelper} that provides basic methods
@@ -138,18 +138,19 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
         }
 
 
+        View layoutView = this.mLayoutView;
         if (requireLayoutView()) {
-            if (mLayoutView != null) {
+            if (layoutView != null) {
                 // TODO: recycle LayoutView
                 // helper.detachChildView(mLayoutView);
             }
         } else {
             // if no layoutView is required, remove it
-            if (mLayoutView != null) {
+            if (layoutView != null) {
                 if (mLayoutViewUnBindListener != null) {
-                    mLayoutViewUnBindListener.onUnbind(mLayoutView, this);
+                    mLayoutViewUnBindListener.onUnbind(layoutView, this);
                 }
-                helper.removeChildView(mLayoutView);
+                helper.removeChildView(layoutView);
                 mLayoutView = null;
             }
         }
@@ -174,57 +175,57 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
             Log.d(TAG, "call afterLayout() on " + this.getClass().getSimpleName());
         }
 
+        final Rect region = this.mLayoutRegion;
+        View layoutView = this.mLayoutView;
 
         if (requireLayoutView()) {
-            if (isValidScrolled(scrolled) && mLayoutView != null) {
+            if (isValidScrolled(scrolled) && layoutView != null) {
                 // initial layout do reset
-                mLayoutRegion.union(mLayoutView.getLeft(), mLayoutView.getTop(), mLayoutView.getRight(), mLayoutView.getBottom());
+                region.union(layoutView.getLeft(), layoutView.getTop(), layoutView.getRight(), layoutView.getBottom());
             }
-
-
-            if (!mLayoutRegion.isEmpty()) {
+            if (!region.isEmpty()) {
                 if (isValidScrolled(scrolled)) {
                     if (helper.getOrientation() == VirtualLayoutManager.VERTICAL) {
-                        mLayoutRegion.offset(0, -scrolled);
+                        region.offset(0, -scrolled);
                     } else {
-                        mLayoutRegion.offset(-scrolled, 0);
+                        region.offset(-scrolled, 0);
                     }
                 }
                 int contentWidth = helper.getContentWidth();
                 int contentHeight = helper.getContentHeight();
                 if (helper.getOrientation() == VirtualLayoutManager.VERTICAL ?
-                        mLayoutRegion.intersects(0, -contentHeight / 4, contentWidth, contentHeight + contentHeight / 4) :
-                        mLayoutRegion.intersects(-contentWidth / 4, 0, contentWidth + contentWidth / 4, contentHeight)) {
+                        region.intersects(0, -contentHeight / 4, contentWidth, contentHeight + contentHeight / 4) :
+                        region.intersects(-contentWidth / 4, 0, contentWidth + contentWidth / 4, contentHeight)) {
 
-                    if (mLayoutView == null) {
-                        mLayoutView = helper.generateLayoutView();
-                        helper.addOffFlowView(mLayoutView, true);
+                    if (layoutView == null) {
+                        mLayoutView = layoutView = helper.generateLayoutView();
+                        helper.addOffFlowView(layoutView, true);
                     }
                     //finally fix layoutRegion's height and with here to avoid visual blank
                     if (helper.getOrientation() == VirtualLayoutManager.VERTICAL) {
-                        mLayoutRegion.left = helper.getPaddingLeft() + mMarginLeft;
-                        mLayoutRegion.right = helper.getContentWidth() - helper.getPaddingRight() - mMarginRight;
+                        region.left = helper.getPaddingLeft() + mMarginLeft;
+                        region.right = helper.getContentWidth() - helper.getPaddingRight() - mMarginRight;
                     } else {
-                        mLayoutRegion.top = helper.getPaddingTop() + mMarginTop;
-                        mLayoutRegion.bottom = helper.getContentWidth() - helper.getPaddingBottom() - mMarginBottom;
+                        region.top = helper.getPaddingTop() + mMarginTop;
+                        region.bottom = helper.getContentWidth() - helper.getPaddingBottom() - mMarginBottom;
                     }
 
-                    bindLayoutView(mLayoutView);
+                    bindLayoutView(layoutView);
                     return;
                 } else {
-                    mLayoutRegion.set(0, 0, 0, 0);
-                    if (mLayoutView != null) {
-                        mLayoutView.layout(0, 0, 0, 0);
+                    region.set(0, 0, 0, 0);
+                    if (layoutView != null) {
+                        layoutView.layout(0, 0, 0, 0);
                     }
                 }
             }
         }
 
-        if (mLayoutView != null) {
+        if (layoutView != null) {
             if (mLayoutViewUnBindListener != null) {
-                mLayoutViewUnBindListener.onUnbind(mLayoutView, this);
+                mLayoutViewUnBindListener.onUnbind(layoutView, this);
             }
-            helper.removeChildView(mLayoutView);
+            helper.removeChildView(layoutView);
             mLayoutView = null;
         }
 
@@ -244,23 +245,23 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
                         tempRect.setEmpty();
                     } else {
                         final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams)
-                            refer.getLayoutParams();
+                                refer.getLayoutParams();
                         if (helper.getOrientation() == VirtualLayoutManager.VERTICAL) {
                             tempRect.union(helper.getDecoratedLeft(refer) - params.leftMargin,
-                                orientationHelper.getDecoratedStart(refer),
-                                helper.getDecoratedRight(refer) + params.rightMargin,
-                                orientationHelper.getDecoratedEnd(refer));
+                                    orientationHelper.getDecoratedStart(refer),
+                                    helper.getDecoratedRight(refer) + params.rightMargin,
+                                    orientationHelper.getDecoratedEnd(refer));
                         } else {
                             tempRect.union(orientationHelper.getDecoratedStart(refer),
-                                helper.getDecoratedTop(refer) - params.topMargin, orientationHelper.getDecoratedEnd(refer),
-                                helper.getDecoratedBottom(refer) + params.bottomMargin);
+                                    helper.getDecoratedTop(refer) - params.topMargin, orientationHelper.getDecoratedEnd(refer),
+                                    helper.getDecoratedBottom(refer) + params.bottomMargin);
                         }
                     }
                 }
             }
             if (!tempRect.isEmpty()) {
                 mLayoutRegion.set(tempRect.left - mPaddingLeft, tempRect.top - mPaddingTop,
-                    tempRect.right + mPaddingRight, tempRect.bottom + mPaddingBottom);
+                        tempRect.right + mPaddingRight, tempRect.bottom + mPaddingBottom);
             } else {
                 mLayoutRegion.setEmpty();
             }
@@ -396,8 +397,9 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
 
         /**
          * Implement it by maintaining a map between layoutView and image url or setting a unique tag to view. It's up to your choice.
+         *
          * @param layoutView view ready to be binded with an image
-*        * @param id layoutView's identifier
+         *                   * @param id layoutView's identifier
          */
         void onBindViewSuccess(View layoutView, String id);
     }
@@ -412,7 +414,7 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
      * when binding image to it would cause view tree to relayout, then the same  {@link LayoutViewBindListener#onBind(View, BaseLayoutHelper)} would be called.
      * User should provide enough information to tell LayoutHelper whether image has been bind success.
      * If image has been successfully binded , no more dead loop happens.
-     *
+     * <p>
      * Of course you can handle this logic by yourself and ignore this helper.
      */
     public static class DefaultLayoutViewHelper implements LayoutViewBindListener, LayoutViewUnBindListener, LayoutViewHelper {
@@ -422,8 +424,8 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
         private final LayoutViewUnBindListener mLayoutViewUnBindListener;
 
         public DefaultLayoutViewHelper(
-            LayoutViewBindListener layoutViewBindListener,
-            LayoutViewUnBindListener layoutViewUnBindListener) {
+                LayoutViewBindListener layoutViewBindListener,
+                LayoutViewUnBindListener layoutViewUnBindListener) {
             mLayoutViewBindListener = layoutViewBindListener;
             mLayoutViewUnBindListener = layoutViewUnBindListener;
         }
@@ -458,6 +460,7 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
 
     /**
      * Better to use {@link #setLayoutViewHelper(DefaultLayoutViewHelper)}
+     *
      * @param bindListener
      */
     public void setLayoutViewBindListener(LayoutViewBindListener bindListener) {
@@ -466,6 +469,7 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
 
     /**
      * Better to use {@link #setLayoutViewHelper(DefaultLayoutViewHelper)}
+     *
      * @param layoutViewUnBindListener
      */
     public void setLayoutViewUnBindListener(
@@ -508,6 +512,7 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
     /**
      * Helper methods to handle focus states for views
      * FIXME 可变参数性能不好,会引起一次潜在的数组对象创建,在频繁滑动过程中,容易引起GC,如果只有一个View,建议调用上述方法
+     *
      * @param result
      * @param views
      */

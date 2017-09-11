@@ -206,8 +206,10 @@ public class VirtualLayoutManager extends ExposeLinearLayoutManagerEx implements
                 if (helper.getItemCount() > 0) {
                     helper.setRange(start, start + helper.getItemCount() - 1);
                 } else {
-                    helper.setRange(start, start);
+                    helper.setRange(-1, -1);
                 }
+
+                helper.setZIndex(start);
 
                 start += helper.getItemCount();
             }

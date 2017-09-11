@@ -91,9 +91,7 @@ public abstract class LayoutHelper {
         }
 
 
-        if (getItemCount() == 0 && start == end) {
-            // range empty
-        } else if ((end - start + 1) != getItemCount()) {
+        if ((end - start + 1) != getItemCount()) {
             throw new MismatchChildCountException("ItemCount mismatch when range: " + mRange.toString() + " childCount: " + getItemCount());
         }
 
