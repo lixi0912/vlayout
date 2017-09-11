@@ -54,6 +54,7 @@ public class TypeDividerDecoration extends RecyclerView.ItemDecoration {
     private int marginStart;
     private int marginEnd;
     private Drawable mDivider;
+    private boolean overlay;
 
     public static TypeDividerDecoration simple(Context context, int orientation) {
         return new TypeDividerDecoration(context, orientation, new SimpleTypeCondition());
@@ -99,10 +100,27 @@ public class TypeDividerDecoration extends RecyclerView.ItemDecoration {
         mOrientation = orientation;
     }
 
+    public void setOverlay(boolean overlay) {
+        this.overlay = overlay;
+    }
+
+    @Override
+    public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+        super.onDraw(c, parent, state);
+        if (parent.getLayoutManager() == null || mDivider == null || overlay) {
+            return;
+        }
+        if (mOrientation == VERTICAL) {
+            drawVertical(c, parent);
+        } else {
+            drawHorizontal(c, parent);
+        }
+    }
+
     @Override
     public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
         super.onDrawOver(c, parent, state);
-        if (parent.getLayoutManager() == null || mDivider == null) {
+        if (parent.getLayoutManager() == null || mDivider == null || !overlay) {
             return;
         }
         if (mOrientation == VERTICAL) {
@@ -181,7 +199,7 @@ public class TypeDividerDecoration extends RecyclerView.ItemDecoration {
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
                                RecyclerView.State state) {
         Drawable divider = mDivider;
-        if (divider == null || !condition.typeWasRegistered(parent, view)) {
+        if (divider == null || !condition.typeWasRegistered(parent, view) || overlay) {
             outRect.setEmpty();
             return;
         }
