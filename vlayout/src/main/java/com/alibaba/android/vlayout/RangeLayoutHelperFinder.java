@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 /**
- * An implement of {@link LayoutHelperFinder} which finds layoutHelpers by position
+  An implement of {@link LayoutHelperFinder} which finds layoutHelpers by position
  */
 public class RangeLayoutHelperFinder extends LayoutHelperFinder {
 
@@ -50,14 +50,6 @@ public class RangeLayoutHelperFinder extends LayoutHelperFinder {
         @Override
         public int compare(LayoutHelperItem lhs, LayoutHelperItem rhs) {
             return lhs.getStartPosition() - rhs.getStartPosition();
-        }
-    };
-
-    private Comparator<LayoutHelper> mLayoutHelperComparator = new Comparator<LayoutHelper>() {
-        @Override
-        public int compare(LayoutHelper lhs, LayoutHelper rhs) {
-            return lhs.getZIndex() - rhs.getZIndex();
-//            return lhs.getRange().getLower() - rhs.getRange().getLower();
         }
     };
 
@@ -94,19 +86,15 @@ public class RangeLayoutHelperFinder extends LayoutHelperFinder {
      */
     @Override
     public void setLayouts(@Nullable List<LayoutHelper> layouts) {
-        final List<LayoutHelperItem> layoutHelperItems = mLayoutHelperItems;
-
         mLayoutHelpers.clear();
-        layoutHelperItems.clear();
+        mLayoutHelperItems.clear();
         if (layouts != null) {
             for (LayoutHelper helper : layouts) {
                 mLayoutHelpers.add(helper);
-                layoutHelperItems.add(new LayoutHelperItem(helper));
+                mLayoutHelperItems.add(new LayoutHelperItem(helper));
             }
 
-            Collections.sort(layoutHelperItems, mLayoutHelperItemComparator);
-
-            Collections.sort(mLayoutHelpers, mLayoutHelperComparator);
+            Collections.sort(mLayoutHelperItems, mLayoutHelperItemComparator);
         }
     }
 
@@ -119,9 +107,7 @@ public class RangeLayoutHelperFinder extends LayoutHelperFinder {
     @Nullable
     @Override
     public LayoutHelper getLayoutHelper(int position) {
-        final List<LayoutHelperItem> layouts = mLayoutHelperItems;
-
-        final int count = layouts.size();
+        final int count = mLayoutHelperItems.size();
         if (count == 0) {
             return null;
         }
@@ -132,13 +118,14 @@ public class RangeLayoutHelperFinder extends LayoutHelperFinder {
         // binary search range
         while (s <= e) {
             m = (s + e) / 2;
-            rs = layouts.get(m);
+            rs = mLayoutHelperItems.get(m);
             if (rs.getStartPosition() > position) {
                 e = m - 1;
             } else if (rs.getEndPosition() < position) {
                 s = m + 1;
             } else if (rs.getStartPosition() <= position && rs.getEndPosition() >= position)
                 break;
+
             rs = null;
         }
 
@@ -147,11 +134,12 @@ public class RangeLayoutHelperFinder extends LayoutHelperFinder {
 
 
     static class LayoutHelperItem {
-        LayoutHelper layoutHelper;
 
         LayoutHelperItem(LayoutHelper helper) {
             this.layoutHelper = helper;
         }
+
+        LayoutHelper layoutHelper;
 
         public int getStartPosition() {
             return layoutHelper.getRange().getLower();
