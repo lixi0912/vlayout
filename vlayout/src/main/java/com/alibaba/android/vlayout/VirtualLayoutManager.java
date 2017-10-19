@@ -377,10 +377,13 @@ public class VirtualLayoutManager extends ExposeLinearLayoutManagerEx implements
         return 0;
     }
 
-
     public int obtainExtraMargin(View child, boolean isLayoutEnd) {
+        return obtainExtraMargin(child, isLayoutEnd, true);
+    }
+
+    public int obtainExtraMargin(View child, boolean isLayoutEnd, boolean useAnchor) {
         if (child != null) {
-            return computeAlignOffset(child, isLayoutEnd, true);
+            return computeAlignOffset(child, isLayoutEnd, useAnchor);
         }
 
         return 0;
@@ -843,6 +846,8 @@ public class VirtualLayoutManager extends ExposeLinearLayoutManagerEx implements
 
 
         public int zIndex = 0;
+
+        public int mOverlapOffset = 0;
 
         public float mAspectRatio = Float.NaN;
 
