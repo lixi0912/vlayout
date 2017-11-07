@@ -44,7 +44,7 @@ import static com.alibaba.android.vlayout.layout.FixLayoutHelper.TOP_RIGHT;
 
 /**
  * LayoutHelper that will be located as fix position at first layout, but its position could be changed by dragingg and dropping
- *
+ * <p>
  * Created by villadora on 15/8/28.
  */
 public class FloatLayoutHelper extends FixAreaLayoutHelper {
@@ -69,6 +69,19 @@ public class FloatLayoutHelper extends FixAreaLayoutHelper {
     private int mX = 0;
     private int mY = 0;
     private int mAlignType = FixLayoutHelper.TOP_LEFT;
+
+    private boolean dragEnable;
+
+    public boolean isDragEnable() {
+        return dragEnable;
+    }
+
+    public void setDragEnable(boolean drag) {
+        this.dragEnable = drag;
+        if (null != mFixView) {
+            mFixView.setOnTouchListener(drag ? touchDragListener : null);
+        }
+    }
 
     public void setDefaultLocation(int x, int y) {
         this.mX = x;
@@ -201,13 +214,17 @@ public class FloatLayoutHelper extends FixAreaLayoutHelper {
                 // TODO: nested scrollBy
                 if (mFixView.getParent() == null) {
                     helper.addFixedView(mFixView);
-                    mFixView.setOnTouchListener(touchDragListener);
+                    if (dragEnable) {
+                        mFixView.setOnTouchListener(touchDragListener);
+                    }
                     mFixView.setTranslationX(mTransitionX);
                     mFixView.setTranslationY(mTransitionY);
                 } else {
                     helper.showView(mFixView);
                     // helper.removeChildView(mFixView);
-                    mFixView.setOnTouchListener(touchDragListener);
+                    if (dragEnable) {
+                        mFixView.setOnTouchListener(touchDragListener);
+                    }
                     helper.addFixedView(mFixView);
                 }
             } else {
@@ -217,7 +234,9 @@ public class FloatLayoutHelper extends FixAreaLayoutHelper {
                 helper.addFixedView(mFixView);
                 mFixView.setTranslationX(mTransitionX);
                 mFixView.setTranslationY(mTransitionY);
-                mFixView.setOnTouchListener(touchDragListener);
+                if (dragEnable) {
+                    mFixView.setOnTouchListener(touchDragListener);
+                }
             }
         }
 
@@ -275,8 +294,8 @@ public class FloatLayoutHelper extends FixAreaLayoutHelper {
                     helper.getContentHeight() - helper.getPaddingTop() - helper.getPaddingBottom(), params.height, layoutInVertical);
             if (!Float.isNaN(params.mAspectRatio) && params.mAspectRatio > 0) {
                 widthSpec = helper.getChildMeasureSpec(
-                    helper.getContentWidth() - helper.getPaddingLeft() - helper.getPaddingRight(),
-                     (int) (View.MeasureSpec.getSize(heightSpec) * params.mAspectRatio + 0.5f), !layoutInVertical);
+                        helper.getContentWidth() - helper.getPaddingLeft() - helper.getPaddingRight(),
+                        (int) (View.MeasureSpec.getSize(heightSpec) * params.mAspectRatio + 0.5f), !layoutInVertical);
             } else if (!Float.isNaN(mAspectRatio) && mAspectRatio > 0) {
                 widthSpec = helper.getChildMeasureSpec(
                         helper.getContentWidth() - helper.getPaddingLeft() - helper.getPaddingRight(),
@@ -409,7 +428,7 @@ public class FloatLayoutHelper extends FixAreaLayoutHelper {
                         int curTranslateX = translateX - v.getLeft() - leftMargin - mAdjuster.left;
                         v.setTranslationX(curTranslateX);
                         int curTranslateY = translateY - v.getTop() - topMargin/* - mAdjuster.top*/;
-                        if (curTranslateY + v.getHeight() + v.getTop() + bottomMargin/* + mAdjuster.bottom */> parentViewHeight) {
+                        if (curTranslateY + v.getHeight() + v.getTop() + bottomMargin/* + mAdjuster.bottom */ > parentViewHeight) {
                             curTranslateY = parentViewHeight - v.getHeight()
                                     - v.getTop() - bottomMargin/* - mAdjuster.bottom*/;
                         }
