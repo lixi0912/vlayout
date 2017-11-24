@@ -178,9 +178,6 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
 
         int index = p.first.mIndex;
 
-        return (int) getCantor(subItemType, index);
-    }
-
     public static int encodeViewType(int viewType, int index) {
         return (int) getCantor(viewType, index);
     }
@@ -220,7 +217,7 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
         /*
          * Now we have a pairing function problem, we use cantor pairing function for itemId.
          */
-        return getCantor(index, itemId);
+        return CantorPairFunctions.process(index, itemId);
     }
 
     @Override
@@ -705,11 +702,6 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
         protected void onBindViewHolderWithOffset(VH holder, int position, int offsetTotal) {
 
         }
-    }
-
-
-    private static long getCantor(long k1, long k2) {
-        return (k1 + k2) * (k1 + k2 + 1) / 2 + k2;
     }
 
 }
