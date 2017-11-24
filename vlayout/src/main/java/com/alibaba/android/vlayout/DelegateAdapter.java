@@ -177,25 +177,7 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
 
 
         int index = p.first.mIndex;
-
-    public static int encodeViewType(int viewType, int index) {
-        return (int) getCantor(viewType, index);
-    }
-
-    public static int encodeViewType(DelegateAdapter adapter, int viewType, int index) {
-        if (adapter.mHasConsistItemType) {
-            return viewType;
-        }
-
-        return (int) getCantor(viewType, index);
-    }
-
-    public static int decodeViewType(int viewType) {
-        int w = (int) (Math.floor(Math.sqrt(8 * viewType + 1) - 1) / 2);
-        int t = (w * w + w) / 2;
-
-        int index = viewType - t;
-        return w - index;
+        return (int) CantorPairFunctions.process(subItemType, index);
     }
 
 
@@ -219,6 +201,19 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
          */
         return CantorPairFunctions.process(index, itemId);
     }
+
+    public static int adapterIndexOf(int cantorViewType) {
+        return (int) CantorPairFunctions.reverseY(cantorViewType);
+    }
+
+    public static int viewTypeOf(int cantorViewType) {
+        return (int) CantorPairFunctions.reverseX(cantorViewType);
+    }
+
+    public static long itemIdOf(long cantorItemId) {
+        return CantorPairFunctions.reverseY(cantorItemId);
+    }
+
 
     @Override
     public void setHasStableIds(boolean hasStableIds) {
@@ -584,7 +579,7 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
                 }
 
                 // set helpers to refresh range
-                 DelegateAdapter.super.setLayoutHelpers(helpers);
+                DelegateAdapter.super.setLayoutHelpers(helpers);
             }
             return true;
         }
