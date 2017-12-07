@@ -21,6 +21,7 @@ public class RootActivity extends ListActivity {
             TestActivity.class.getSimpleName(),
             OnePlusNLayoutActivity.class.getSimpleName(),
             RealmDemoActivity.class.getSimpleName()
+            DebugActivity.class.getSimpleName()
     };
 
     private Class[] mActivities = new Class[]{
@@ -29,6 +30,7 @@ public class RootActivity extends ListActivity {
             TestActivity.class,
             OnePlusNLayoutActivity.class,
             RealmDemoActivity.class
+            DebugActivity.class
     };
 
     @Override
