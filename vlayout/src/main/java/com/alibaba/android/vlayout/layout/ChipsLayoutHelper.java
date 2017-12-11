@@ -17,7 +17,6 @@ import static android.support.v7.widget.LinearLayoutManager.VERTICAL;
  * @description <>
  * @date 2017/8/7
  */
-
 public class ChipsLayoutHelper extends BaseLayoutHelper {
 
     private int mHGap;
@@ -31,7 +30,12 @@ public class ChipsLayoutHelper extends BaseLayoutHelper {
         this.mVGap = mVGap;
     }
 
-    private Span first = new Span();
+    private final RowSpan first = new RowSpan();
+    private boolean avgRowSpacing;
+
+    public void setAvgRowSpacing(boolean enable) {
+        this.avgRowSpacing = enable;
+    }
 
 
     @Override
@@ -44,9 +48,6 @@ public class ChipsLayoutHelper extends BaseLayoutHelper {
         }
 
         final boolean layoutInVertical = helper.getOrientation() == VERTICAL;
-//        final int itemDirection = layoutState.getItemDirection();
-//        final boolean layingOutInPrimaryDirection =
-//                itemDirection == VirtualLayoutManager.LayoutStateWrapper.ITEM_DIRECTION_TAIL;
 
         int maxSize;
         if (layoutInVertical) {
@@ -63,8 +64,8 @@ public class ChipsLayoutHelper extends BaseLayoutHelper {
         OrientationHelperEx orientationHelper = helper.getMainOrientationHelper();
 
         if (layoutInVertical) {
-            Span span = first;
-            span.clear();
+            RowSpan span = first;
+            span.resetAll();
             while (layoutState.hasMore(state) && !isOutOfRange(layoutState.getCurrentPosition())) {
                 // find corresponding layout container
                 View view = nextView(recycler, layoutState, helper, result);
@@ -91,17 +92,19 @@ public class ChipsLayoutHelper extends BaseLayoutHelper {
 
                 if ((maxSize - span.usedWidth - hGap < viewWidth) && !span.views.isEmpty()) {
                     // add to new line
-                    span.totalSpacing = Math.max(maxSize - span.usedWidth, 0);
-                    span = (span.next = new Span());
+                    span.totalRowSpacing = Math.max(maxSize - span.usedWidth, 0);
+                    span = span.moveToNextRow();
                 }
-                span.maxViewHeight = Math.max(span.maxViewHeight,
+                span.maxRowHeight = Math.max(span.maxRowHeight,
                         orientationHelper.getDecoratedMeasurement(view));
                 span.usedWidth += hGap + viewWidth;
                 span.views.add(view);
             }
             // add last line
-            span.totalSpacing = maxSize - span.usedWidth;
+            span.totalRowSpacing = maxSize - span.usedWidth;
             final int defaultNewViewLine = layoutState.getOffset();
+
+            span.destroyAfterIfNeed();
             layoutVerticalChild(helper, orientationHelper, result, defaultNewViewLine, hGap, vGap);
         } else {
             // TODO
@@ -110,6 +113,7 @@ public class ChipsLayoutHelper extends BaseLayoutHelper {
 
     private void layoutVerticalChild(LayoutManagerHelper helper, OrientationHelperEx orientationHelper,
                                      LayoutChunkResult result, int defaultNewViewLine, int hGap, int vGap) {
+        final boolean avgRowSpacing = this.avgRowSpacing;
         int top = helper.getPaddingTop() + mMarginTop + mPaddingTop + defaultNewViewLine;
         int bottom = 0;
 
@@ -119,29 +123,30 @@ public class ChipsLayoutHelper extends BaseLayoutHelper {
         int gap;
         int right;
 
-        for (Span span = first; null != span; ) {
-            List<View> views = span.views;
-            if (views.isEmpty())
+        RowSpan span = first;
+        while (null != span) {
+            List<View> columnViews = span.views;
+            if (columnViews.isEmpty()) {
                 break;
-            if (span.reSpacing) {
-                gap = span.totalSpacing / Math.max(views.size() + 1, 2);
+            }
+            if (avgRowSpacing) {
+                gap = span.totalRowSpacing / Math.max(columnViews.size() + 1, 2);
             } else {
                 gap = hGap;
             }
-            bottom = top + span.maxViewHeight;
-            for (View view : views) {
+            bottom = top + span.maxRowHeight;
+            for (View columnView : columnViews) {
                 left += gap;
-                right = left + orientationHelper.getDecoratedMeasurementInOther(view);
-                layoutChild(view, left, top, right, bottom, helper);
+                right = left + orientationHelper.getDecoratedMeasurementInOther(columnView);
+                layoutChild(columnView, left, top, right, bottom, helper);
                 left = right;
-                handleStateOnResult(result, view);
+                handleStateOnResult(result, columnView);
             }
 
-            top += span.maxViewHeight + vGap;
+            top += span.maxRowHeight + vGap;
             left = defaultLeft;
             span = span.next;
         }
-
         result.mConsumed = bottom;
     }
 
@@ -161,26 +166,44 @@ public class ChipsLayoutHelper extends BaseLayoutHelper {
         return super.computeAlignOffset(offset, isLayoutEnd, useAnchor, helper);
     }
 
-    private static class Span {
-        int totalSpacing;
+    private static class RowSpan {
+        int totalRowSpacing;
         int usedWidth;
-        int maxViewHeight;
-        boolean reSpacing;
-        List<View> views = new ArrayList<>();
+        int maxRowHeight;
+        List<View> views;
 
-        Span next;
+        RowSpan next;
 
-        public void clear() {
-            totalSpacing = 0;
+        RowSpan() {
+            this.views = new ArrayList<>();
+        }
+
+        void resetAll() {
+            totalRowSpacing = 0;
             usedWidth = 0;
-            maxViewHeight = 0;
-            reSpacing = false;
+            maxRowHeight = 0;
             views.clear();
-
             if (null != next) {
-                next.clear();
+                next.resetAll();
             }
             next = null;
+        }
+
+        RowSpan moveToNextRow() {
+            RowSpan next = this.next;
+            if (null == next) {
+                this.next = next = new RowSpan();
+            }
+            return next;
+        }
+
+        void destroyAfterIfNeed() {
+            RowSpan next = this.next;
+            this.next = null;
+            if (null != next) {
+                next.views = null;
+                next.destroyAfterIfNeed();
+            }
         }
     }
 }
