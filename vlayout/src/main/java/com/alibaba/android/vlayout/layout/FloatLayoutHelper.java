@@ -53,9 +53,11 @@ public class FloatLayoutHelper extends FixAreaLayoutHelper {
 
     private int mTransitionX = 0;
     private int mTransitionY = 0;
+    private boolean dragEnable;
 
     public FloatLayoutHelper() {
 
+        this.dragEnable = true;
     }
 
     private int mZIndex = 1;
@@ -69,19 +71,6 @@ public class FloatLayoutHelper extends FixAreaLayoutHelper {
     private int mX = 0;
     private int mY = 0;
     private int mAlignType = FixLayoutHelper.TOP_LEFT;
-
-    private boolean dragEnable;
-
-    public boolean isDragEnable() {
-        return dragEnable;
-    }
-
-    public void setDragEnable(boolean drag) {
-        this.dragEnable = drag;
-        if (null != mFixView) {
-            mFixView.setOnTouchListener(drag ? touchDragListener : null);
-        }
-    }
 
     public void setDefaultLocation(int x, int y) {
         this.mX = x;
@@ -466,4 +455,11 @@ public class FloatLayoutHelper extends FixAreaLayoutHelper {
             animator.start();
         }
     };
+
+    public void setDragEnable(boolean dragEnable) {
+        this.dragEnable = dragEnable;
+        if (null != mFixView) {
+            mFixView.setOnTouchListener(dragEnable ? touchDragListener : null);
+        }
+    }
 }
