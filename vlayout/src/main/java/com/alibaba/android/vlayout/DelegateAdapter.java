@@ -67,7 +67,7 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
 
     private final SparseArray<Pair<AdapterDataObserver, Adapter>> mIndexAry = new SparseArray<>();
 
-    private  long[] cantorReverse = new long[2];
+    private long[] cantorReverse = new long[2];
 
     /**
      * Delegate Adapter merge multi sub adapters, default is thread-unsafe
@@ -132,18 +132,26 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List<Object> payloads) {
+        super.onBindViewHolder(holder, position, payloads);
         Pair<AdapterDataObserver, Adapter> pair = findAdapterByPosition(position);
         if (pair == null) {
             return;
         }
 
         pair.second.onBindViewHolder(holder, position - pair.first.mStartPosition, payloads);
-        pair.second.onBindViewHolderWithOffset(holder, position - pair.first.mStartPosition, position);
+        pair.second.onBindViewHolderWithOffset(holder, position - pair.first.mStartPosition, position, payloads);
     }
 
+    @SuppressWarnings("unchecked")
     @Deprecated
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        Pair<AdapterDataObserver, Adapter> pair = findAdapterByPosition(position);
+        if (pair == null) {
+            return;
+        }
+        pair.second.onBindViewHolder(holder, position - pair.first.mStartPosition);
+        pair.second.onBindViewHolderWithOffset(holder, position - pair.first.mStartPosition, position);
     }
 
     @Override
@@ -598,6 +606,14 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
         }
 
         @Override
+        public void onItemRangeChanged(int positionStart, int itemCount, Object payload) {
+            if (!updateLayoutHelper()) {
+                return;
+            }
+            notifyItemChanged(mStartPosition + positionStart, payload);
+        }
+
+        @Override
         public void onItemRangeRemoved(int positionStart, int itemCount) {
             if (!updateLayoutHelper()) {
                 return;
@@ -701,6 +717,10 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
 
         protected void onBindViewHolderWithOffset(VH holder, int position, int offsetTotal) {
 
+        }
+
+        protected void onBindViewHolderWithOffset(VH holder, int position, int offsetTotal, List<Object> payloads) {
+            onBindViewHolderWithOffset(holder, position, offsetTotal);
         }
     }
 
