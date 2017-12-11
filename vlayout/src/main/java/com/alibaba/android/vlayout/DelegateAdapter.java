@@ -67,6 +67,8 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
 
     private final SparseArray<Pair<AdapterDataObserver, Adapter>> mIndexAry = new SparseArray<>();
 
+    private  long[] cantorReverse = new long[2];
+
     /**
      * Delegate Adapter merge multi sub adapters, default is thread-unsafe
      *
@@ -113,11 +115,10 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
 
 
         // reverse Cantor Function
-        int w = (int) (Math.floor(Math.sqrt(8 * viewType + 1) - 1) / 2);
-        int t = (w * w + w) / 2;
+        Cantor.reverseCantor(viewType, cantorReverse);
 
-        int index = viewType - t;
-        int subItemType = w - index;
+        int index = (int) cantorReverse[1];
+        int subItemType = (int) cantorReverse[0];
 
         Adapter adapter = findAdapterByIndex(index);
         if (adapter == null) {
@@ -177,7 +178,7 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
 
 
         int index = p.first.mIndex;
-        return (int) CantorPairFunctions.process(subItemType, index);
+        return (int) Cantor.getCantor(subItemType, index);
     }
 
 
@@ -199,19 +200,25 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
         /*
          * Now we have a pairing function problem, we use cantor pairing function for itemId.
          */
-        return CantorPairFunctions.process(index, itemId);
+        return Cantor.getCantor(index, itemId);
     }
 
     public static int adapterIndexOf(int cantorViewType) {
-        return (int) CantorPairFunctions.reverseY(cantorViewType);
+        long[] cantorReverse = new long[2];
+        Cantor.reverseCantor(cantorViewType, cantorReverse);
+        return (int) cantorReverse[1];
     }
 
     public static int viewTypeOf(int cantorViewType) {
-        return (int) CantorPairFunctions.reverseX(cantorViewType);
+        long[] cantorReverse = new long[2];
+        Cantor.reverseCantor(cantorViewType, cantorReverse);
+        return (int) cantorReverse[0];
     }
 
     public static long itemIdOf(long cantorItemId) {
-        return CantorPairFunctions.reverseY(cantorItemId);
+        long[] cantorReverse = new long[2];
+        Cantor.reverseCantor(cantorItemId, cantorReverse);
+        return cantorReverse[1];
     }
 
 
@@ -454,7 +461,6 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
     }
 
     /**
-     *
      * @param absoultePosition
      * @return the relative position in sub adapter by the absoulte position in DelegaterAdapter. Return -1 if no sub adapter founded.
      */
@@ -525,7 +531,6 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
                         + originPair.second.getItemCount());
         return range.contains(targetAdapterPos);
     }
-
 
 
     class AdapterDataObserver extends RecyclerView.AdapterDataObserver {
