@@ -137,9 +137,9 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
         if (pair == null) {
             return;
         }
-
         pair.second.onBindViewHolder(holder, position - pair.first.mStartPosition, payloads);
         pair.second.onBindViewHolderWithOffset(holder, position - pair.first.mStartPosition, position, payloads);
+
     }
 
     @SuppressWarnings("unchecked")
@@ -606,14 +606,6 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
         }
 
         @Override
-        public void onItemRangeChanged(int positionStart, int itemCount, Object payload) {
-            if (!updateLayoutHelper()) {
-                return;
-            }
-            notifyItemChanged(mStartPosition + positionStart, payload);
-        }
-
-        @Override
         public void onItemRangeRemoved(int positionStart, int itemCount) {
             if (!updateLayoutHelper()) {
                 return;
@@ -643,6 +635,14 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
                 return;
             }
             notifyItemRangeChanged(mStartPosition + positionStart, itemCount);
+        }
+
+        @Override
+        public void onItemRangeChanged(int positionStart, int itemCount, Object payload) {
+            if (!updateLayoutHelper()) {
+                return;
+            }
+            notifyItemRangeChanged(mStartPosition + positionStart, itemCount, payload);
         }
     }
 
