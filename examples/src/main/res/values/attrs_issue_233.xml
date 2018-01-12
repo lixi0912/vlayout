@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="SwipeToLoadLayout">
+
+        <attr name="swipe_target" format="reference" />
+        <attr name="swipe_refresh_header" format="reference" />
+        <attr name="swipe_load_more_footer" format="reference" />
+
+        <attr name="refresh_enabled" format="boolean" />
+        <attr name="load_more_enabled" format="boolean" />
+        <attr name="swipe_style" format="enum">
+            <enum name="classic" value="0" />
+            <enum name="above" value="1" />
+            <enum name="blew" value="2" />
+            <enum name="scale" value="3" />
+        </attr>
+
+        <attr name="drag_ratio" format="float" />
+
+        <attr name="refresh_trigger_offset" format="dimension" />
+        <attr name="load_more_trigger_offset" format="dimension" />
+        <attr name="refresh_drag_offset" format="dimension" />
+        <attr name="load_more_drag_offset" format="dimension" />
+
+        <attr name="refresh_abort_duration" format="integer" />
+        <attr name="refresh_release_duration" format="integer" />
+        <attr name="refresh_complete_duration" format="integer" />
+        <attr name="refresh_beginning_duration" format="integer" />
+        <attr name="load_more_abort_duration" format="integer" />
+        <attr name="load_more_release_duration" format="integer" />
+        <attr name="load_more_complete_duration" format="integer" />
+        <attr name="load_more_beginning_duration" format="integer" />
+    </declare-styleable>
+
+
+    <dimen name="divider_height">12dp</dimen>
+</resources>

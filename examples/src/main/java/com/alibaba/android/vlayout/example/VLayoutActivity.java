@@ -109,8 +109,8 @@ public class VLayoutActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_container);
-;
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        ;
         mFirstText = (TextView) findViewById(R.id.first);
         mLastText = (TextView) findViewById(R.id.last);
         mCountText = (TextView) findViewById(R.id.count);
@@ -264,7 +264,7 @@ public class VLayoutActivity extends Activity {
             });
         }
 
-		{
+        {
             RangeGridLayoutHelper layoutHelper = new RangeGridLayoutHelper(4);
             layoutHelper.setBgColor(Color.GREEN);
             layoutHelper.setWeights(new float[]{20f, 26.665f});
@@ -339,7 +339,7 @@ public class VLayoutActivity extends Activity {
 
             adapters.add(new SubAdapter(this, layoutHelper, 23));
         }
-		
+
         {
             SingleLayoutHelper layoutHelper = new SingleLayoutHelper();
             layoutHelper.setBgColor(Color.BLUE);
@@ -616,7 +616,7 @@ public class VLayoutActivity extends Activity {
         }
 
         adapters.add(
-            new FooterAdapter(recyclerView, VLayoutActivity.this, new GridLayoutHelper(1), 1));
+                new FooterAdapter(recyclerView, VLayoutActivity.this, new GridLayoutHelper(1), 1));
 
         delegateAdapter.setAdapters(adapters);
 
@@ -626,8 +626,8 @@ public class VLayoutActivity extends Activity {
         trigger = new Runnable() {
             @Override
             public void run() {
-                 //recyclerView.scrollToPosition(22);
-                 //recyclerView.getAdapter().notifyDataSetChanged();
+                //recyclerView.scrollToPosition(22);
+                //recyclerView.getAdapter().notifyDataSetChanged();
                 //mainHandler.postDelayed(trigger, 1000);
                 //List<DelegateAdapter.Adapter> newAdapters = new ArrayList<>();
                 //newAdapters.add((new SubAdapter(VLayoutActivity.this, new ColumnLayoutHelper(), 3)));
@@ -656,7 +656,6 @@ public class VLayoutActivity extends Activity {
                 //footer.toggleFoot();
             }
         });
-
 
 
         mainHandler.postDelayed(trigger, 1000);
@@ -801,7 +800,7 @@ public class VLayoutActivity extends Activity {
     }
 
 
-    static class SubAdapter extends DelegateAdapter.Adapter<MainViewHolder> {
+    public static class SubAdapter extends DelegateAdapter.Adapter<MainViewHolder> {
 
         private Context mContext;
 
@@ -853,7 +852,7 @@ public class VLayoutActivity extends Activity {
     }
 
 
-    static class MainViewHolder extends RecyclerView.ViewHolder {
+    public static class MainViewHolder extends RecyclerView.ViewHolder {
 
         public static volatile int existing = 0;
         public static int createdTimes = 0;

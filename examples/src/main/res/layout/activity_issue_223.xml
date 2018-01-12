@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <issue223.swipetoloadlayout.SwipeToLoadLayout
+        android:id="@+id/swipe_load_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:swipe_load_more_footer="@+id/swipe_load_more_footer"
+        app:swipe_style="scale"
+        app:swipe_target="@+id/recycler">
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+
+        <issue223.LoadView
+            android:id="@id/swipe_load_more_footer"
+            android:layout_width="match_parent"
+            android:layout_height="66dp"
+            android:layout_gravity="bottom"
+            android:gravity="center" />
+
+    </issue223.swipetoloadlayout.SwipeToLoadLayout>
+
+
+</LinearLayout>
