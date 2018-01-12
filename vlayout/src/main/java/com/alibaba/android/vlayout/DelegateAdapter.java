@@ -469,15 +469,17 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
     }
 
     /**
-     * @param absoultePosition
-     * @return the relative position in sub adapter by the absoulte position in DelegaterAdapter. Return -1 if no sub adapter founded.
+     * The absolute position to the sub adapter position (relative position)
+     *
+     * @param absolutePosition absolute position in DelegateAdapter
+     * @return the relative position in sub adapter by the absolute position in DelegateAdapter. Return -1 if no sub adapter founded.
      */
-    public int findOffsetPosition(int absoultePosition) {
-        Pair<AdapterDataObserver, Adapter> p = findAdapterByPosition(absoultePosition);
+    public int findOffsetPosition(int absolutePosition) {
+        Pair<AdapterDataObserver, Adapter> p = findAdapterByPosition(absolutePosition);
         if (p == null) {
             return -1;
         }
-        int subAdapterPosition = absoultePosition - p.first.mStartPosition;
+        int subAdapterPosition = absolutePosition - p.first.mStartPosition;
         return subAdapterPosition;
     }
 
