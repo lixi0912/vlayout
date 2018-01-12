@@ -59,6 +59,7 @@
         <activity android:name="com.alibaba.android.vlayout.example.DebugActivity">
 
         </activity>
+        <activity android:name=".issue.Issue223Activity" />
 
     </application>
 
