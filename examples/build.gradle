@@ -53,6 +53,6 @@ dependencies {
     compile project(':vlayout')
     compile 'com.crittercism.dexmaker:dexmaker:1.4'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.android.support:appcompat-v7:25.2.0'
-    compile 'com.android.support:support-annotations:25.2.0'
+    implementation "com.android.support:support-annotations:${SDK_VERSION}"
+    implementation "com.android.support:appcompat-v7:${SDK_VERSION}"
 }

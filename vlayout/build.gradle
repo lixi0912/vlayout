@@ -52,29 +52,14 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    api fileTree(dir: 'libs', include: ['*.jar'])
     // compile project(':extension')
-    implementation "com.android.support:recyclerview-v7:${SDK_VERSION}@aar"
-    implementation "com.android.support:support-annotations:${SDK_VERSION}"
-    implementation "com.android.support:appcompat-v7:${SDK_VERSION}"
+    api "com.android.support:recyclerview-v7:${SDK_VERSION}@aar"
+    api "com.android.support:support-annotations:${SDK_VERSION}"
+    api "com.android.support:appcompat-v7:${SDK_VERSION}"
 
-    implementation "com.android.support:support-core-ui:${SDK_VERSION}"
+    api "com.android.support:support-core-ui:${SDK_VERSION}"
 
     androidTestCompile "org.robolectric:robolectric:3.0"
 }
 
-
-File deployConfig = rootProject.file('deploy.gradle')
-if (deployConfig.exists()) {
-    apply from: rootProject.file('deploy.gradle')
-}
-
-deployConfig = rootProject.file('jcenterInstall.gradle')
-if (deployConfig.exists()) {
-    apply from: rootProject.file('jcenterInstall.gradle')
-}
-
-deployConfig = rootProject.file('jcenterDeploy.gradle')
-if (deployConfig.exists()) {
-    apply from: rootProject.file('jcenterDeploy.gradle')
-}

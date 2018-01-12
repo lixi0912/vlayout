@@ -110,7 +110,6 @@ public class VLayoutActivity extends Activity {
         setContentView(R.layout.main_activity);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_container);
-;
         mFirstText = (TextView) findViewById(R.id.first);
         mLastText = (TextView) findViewById(R.id.last);
         mCountText = (TextView) findViewById(R.id.count);

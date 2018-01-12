@@ -30,14 +30,18 @@ buildscript {
         maven { url "http://oss.jfrog.org/oss-snapshot-local/" }
         mavenCentral()
         jcenter()
+        maven{
+            url "https://dl.google.com/dl/android/maven2/"
+        }
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.2'
+        classpath 'com.android.tools.build:gradle:3.0.1'
         classpath 'com.github.xfumihiro.view-inspector:view-inspector-plugin:0.1.1'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7'
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.4.2'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
-        classpath "io.realm:realm-gradle-plugin:3.3.1"
+        classpath "io.realm:realm-gradle-plugin:3.7.2"
     }
 }
 
@@ -47,5 +51,9 @@ allprojects {
         maven { url "http://oss.jfrog.org/oss-snapshot-local/" }
         jcenter()
         mavenLocal()
+        maven{
+            url "https://dl.google.com/dl/android/maven2/"
+        }
+        google()
     }
 }

@@ -82,8 +82,6 @@ public class RealmDemoActivity extends Activity implements View.OnClickListener 
                         if (delegateAdapter.inRange(originPos, targetPos)) {
                             Pair<?, DelegateAdapter.Adapter> pair = delegateAdapter.findAdapterByPosition(originPos);
                             if (null != pair) {
-                                int index = delegateAdapter.itemIndexOfAdapterPosition(originPos);
-                                DelegateAdapter.Adapter adapter = pair.second;
 
                             }
                         }
@@ -94,8 +92,6 @@ public class RealmDemoActivity extends Activity implements View.OnClickListener 
                     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                         int pos = viewHolder.getAdapterPosition();
 
-                        int itemIndex = delegateAdapter.itemIndexOf(viewHolder);
-                        Log.d(TAG, "itemIndex:" + itemIndex);
 
 
                     }

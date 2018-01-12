@@ -20,7 +20,7 @@ public class RootActivity extends ListActivity {
             MainActivity.class.getSimpleName(),
             TestActivity.class.getSimpleName(),
             OnePlusNLayoutActivity.class.getSimpleName(),
-            RealmDemoActivity.class.getSimpleName()
+            RealmDemoActivity.class.getSimpleName(),
             DebugActivity.class.getSimpleName()
     };
 
@@ -29,7 +29,7 @@ public class RootActivity extends ListActivity {
             MainActivity.class,
             TestActivity.class,
             OnePlusNLayoutActivity.class,
-            RealmDemoActivity.class
+            RealmDemoActivity.class,
             DebugActivity.class
     };
 
