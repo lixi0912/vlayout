@@ -63,7 +63,5 @@ dependencies {
     api "com.android.support:support-annotations:${SDK_VERSION}"
     api "com.android.support:appcompat-v7:${SDK_VERSION}"
     api "com.android.support:support-core-ui:${SDK_VERSION}"
-
-    androidTestCompile "org.robolectric:robolectric:3.0"
 }
 

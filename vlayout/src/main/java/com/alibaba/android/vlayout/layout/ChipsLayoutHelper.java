@@ -47,107 +47,134 @@ public class ChipsLayoutHelper extends BaseLayoutHelper {
             return;
         }
 
-        final boolean layoutInVertical = helper.getOrientation() == VERTICAL;
-
-        int maxSize;
-        if (layoutInVertical) {
-            maxSize = helper.getContentWidth() - helper.getPaddingRight() - helper.getPaddingLeft()
+        final int maxSize = helper.getContentWidth() - helper.getPaddingRight() - helper.getPaddingLeft()
                     - getHorizontalMargin() - getHorizontalPadding();
-        } else {
-            maxSize = helper.getContentHeight() - helper.getPaddingBottom() - helper.getPaddingTop()
-                    - getVerticalMargin() - getVerticalPadding();
-        }
+
 
         int hGap = this.mHGap;
         int vGap = this.mVGap;
 
         OrientationHelperEx orientationHelper = helper.getMainOrientationHelper();
 
-        if (layoutInVertical) {
-            RowSpan span = first;
-            span.resetAll();
-            while (layoutState.hasMore(state) && !isOutOfRange(layoutState.getCurrentPosition())) {
-                // find corresponding layout container
-                View view = nextView(recycler, layoutState, helper, result);
-                if (view == null) {
-                    break;
-                }
-                if (view.getVisibility() == View.GONE) {
-                    continue;
-                }
-
-                VirtualLayoutManager.LayoutParams params = (VirtualLayoutManager.LayoutParams) view.getLayoutParams();
-                int heightSpec = helper.getChildMeasureSpec(
-                        helper.getContentHeight() - helper.getPaddingTop() - helper.getPaddingBottom()
-                                - getVerticalMargin() - getVerticalPadding(), params.height, true);
-
-                int widthSpec = helper.getChildMeasureSpec(
-                        helper.getContentWidth() - helper.getPaddingLeft() - helper.getPaddingRight()
-                                - getHorizontalMargin() - getHorizontalPadding(), params.width, false);
-
-                helper.measureChildWithMargins(view, widthSpec, heightSpec);
-
-
-                int viewWidth = orientationHelper.getDecoratedMeasurementInOther(view);
-
-                if ((maxSize - span.usedWidth - hGap < viewWidth) && !span.views.isEmpty()) {
-                    // add to new line
-                    span.totalRowSpacing = Math.max(maxSize - span.usedWidth, 0);
-                    span = span.moveToNextRow();
-                }
-                span.maxRowHeight = Math.max(span.maxRowHeight,
-                        orientationHelper.getDecoratedMeasurement(view));
-                span.usedWidth += hGap + viewWidth;
-                span.views.add(view);
+        RowSpan span = first;
+        span.resetAll();
+        while (layoutState.hasMore(state) && !isOutOfRange(layoutState.getCurrentPosition())) {
+            // find corresponding layout container
+            View view = nextView(recycler, layoutState, helper, result);
+            if (view == null) {
+                break;
             }
-            // add last line
-            span.totalRowSpacing = maxSize - span.usedWidth;
-            final int defaultNewViewLine = layoutState.getOffset();
+            if (view.getVisibility() == View.GONE) {
+                continue;
+            }
 
-            span.destroyAfterIfNeed();
-            layoutVerticalChild(helper, orientationHelper, result, defaultNewViewLine, hGap, vGap);
-        } else {
-            // TODO
+            VirtualLayoutManager.LayoutParams params = (VirtualLayoutManager.LayoutParams) view.getLayoutParams();
+            int heightSpec = helper.getChildMeasureSpec(
+                    helper.getContentHeight() - helper.getPaddingTop() - helper.getPaddingBottom()
+                            - getVerticalMargin() - getVerticalPadding(), params.height, true);
+
+            int widthSpec = helper.getChildMeasureSpec(
+                    helper.getContentWidth() - helper.getPaddingLeft() - helper.getPaddingRight()
+                            - getHorizontalMargin() - getHorizontalPadding(), params.width, false);
+
+            helper.measureChildWithMargins(view, widthSpec, heightSpec);
+
+
+            int viewWidth = orientationHelper.getDecoratedMeasurementInOther(view);
+
+            if ((maxSize - span.usedWidth - hGap < viewWidth) && !span.views.isEmpty()) {
+                // add to new line
+                span.totalRowSpacing = Math.max(maxSize - span.usedWidth, 0);
+                span = span.moveToNextRow();
+            }
+            span.maxRowHeight = Math.max(span.maxRowHeight,
+                    orientationHelper.getDecoratedMeasurement(view));
+            span.usedWidth += hGap + viewWidth;
+            span.views.add(view);
         }
+        // add last line
+        span.totalRowSpacing = maxSize - span.usedWidth;
+
+        span.destroyAfterIfNeed();
+        layoutVerticalChild(helper, orientationHelper, result, layoutState, hGap, vGap);
     }
 
     private void layoutVerticalChild(LayoutManagerHelper helper, OrientationHelperEx orientationHelper,
-                                     LayoutChunkResult result, int defaultNewViewLine, int hGap, int vGap) {
+                                     LayoutChunkResult result, VirtualLayoutManager.LayoutStateWrapper layoutState, int hGap, int vGap) {
         final boolean avgRowSpacing = this.avgRowSpacing;
-        int top = helper.getPaddingTop() + mMarginTop + mPaddingTop + defaultNewViewLine;
-        int bottom = 0;
+        final boolean layoutStart = layoutState.getLayoutDirection()
+                == VirtualLayoutManager.LayoutStateWrapper.LAYOUT_START;
 
         final int defaultLeft = helper.getPaddingLeft() + mMarginLeft + mPaddingLeft;
         int left = defaultLeft;
 
-        int gap;
+        int top = 0;
+        int bottom = 0;
+
+        int avgHGap;
         int right;
 
-        RowSpan span = first;
-        while (null != span) {
-            List<View> columnViews = span.views;
-            if (columnViews.isEmpty()) {
-                break;
-            }
-            if (avgRowSpacing) {
-                gap = span.totalRowSpacing / Math.max(columnViews.size() + 1, 2);
-            } else {
-                gap = hGap;
-            }
-            bottom = top + span.maxRowHeight;
-            for (View columnView : columnViews) {
-                left += gap;
-                right = left + orientationHelper.getDecoratedMeasurementInOther(columnView);
-                layoutChild(columnView, left, top, right, bottom, helper);
-                left = right;
-                handleStateOnResult(result, columnView);
+
+        if (layoutStart) {
+            bottom = layoutState.getOffset();
+            result.mConsumed = bottom + mPaddingBottom + mMarginBottom;
+
+            RowSpan span = first;
+            while (null != span) {
+                List<View> columnViews = span.views;
+                if (columnViews.isEmpty()) {
+                    break;
+                }
+                if (avgRowSpacing) {
+                    avgHGap = span.totalRowSpacing / Math.max(columnViews.size() + 1, 2);
+                } else {
+                    avgHGap = hGap;
+                }
+                top = bottom - span.maxRowHeight;
+                for (View columnView : columnViews) {
+                    right = left + orientationHelper.getDecoratedMeasurementInOther(columnView);
+                    layoutChild(columnView, left, top, right, bottom, helper);
+                    left = right + avgHGap;
+                    handleStateOnResult(result, columnView);
+                }
+                bottom = top - vGap;
+                left = defaultLeft;
+                span = span.next;
             }
 
-            top += span.maxRowHeight + vGap;
-            left = defaultLeft;
-            span = span.next;
+        } else {
+            top = layoutState.getOffset() + mMarginTop + mPaddingTop;
+
+            RowSpan span = first;
+            while (null != span) {
+                List<View> columnViews = span.views;
+                if (columnViews.isEmpty()) {
+                    break;
+                }
+                if (avgRowSpacing) {
+                    avgHGap = span.totalRowSpacing / Math.max(columnViews.size() + 1, 2);
+                } else {
+                    avgHGap = hGap;
+                }
+
+                bottom = top + span.maxRowHeight;
+
+                for (View columnView : columnViews) {
+                    right = left + orientationHelper.getDecoratedMeasurementInOther(columnView);
+                    layoutChild(columnView, left, top, right, bottom, helper);
+                    left = right + avgHGap;
+                    handleStateOnResult(result, columnView);
+                }
+                top = bottom + vGap;
+                left = defaultLeft;
+                span = span.next;
+            }
+
+
+            result.mConsumed = bottom;
         }
-        result.mConsumed = bottom;
+
+
     }
 
     @Override
@@ -162,7 +189,6 @@ public class ChipsLayoutHelper extends BaseLayoutHelper {
                 return layoutInVertical ? -mMarginTop - mPaddingTop : -mMarginLeft - mPaddingLeft;
             }
         }
-
         return super.computeAlignOffset(offset, isLayoutEnd, useAnchor, helper);
     }
 
