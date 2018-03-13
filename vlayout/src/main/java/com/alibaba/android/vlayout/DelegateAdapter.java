@@ -132,7 +132,6 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List<Object> payloads) {
-        super.onBindViewHolder(holder, position, payloads);
         Pair<AdapterDataObserver, Adapter> pair = findAdapterByPosition(position);
         if (pair == null) {
             return;
