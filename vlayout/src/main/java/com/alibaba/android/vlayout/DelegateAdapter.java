@@ -693,7 +693,7 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
 
         @Override
         public LayoutHelper onCreateLayoutHelper() {
-            return new SingleLayoutHelper();
+            return mLayoutHelper;
         }
 
         @Override

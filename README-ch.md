@@ -42,6 +42,8 @@ VirtualLayout是一个针对RecyclerView的LayoutManager扩展, 主要提供一�
 
 ## 使用
 
+**虽然 vlayout 布局灵活，然而 API 相对原始，手工维护数据及 LayoutHelper 比较麻烦，强烈建议大家使用 [Tangram-Android](https://github.com/alibaba/Tangram-Android) 来间接使用 vlayout，Tangram 具备 vlayout 里所有的功能，且隐藏了细节，通过数据配置即可搭建页面，能避免绝大多数 Issue 里提到的问题，而且重大更新维护主要基于 Tangram，包括局部刷新、响应式接口等。**
+
 版本请参考 [release 说明](https://github.com/alibaba/vlayout/releases)里的最新版本，最新的 aar 都会发布到 jcenter 和 MavenCentral 上，确保配置了这两个仓库源，然后引入aar依赖：
 
 ``` gradle 
@@ -169,4 +171,7 @@ recycler.setAdapter(myAdapter);
 vlayout遵循MIT开源许可证协议。
 
 # 微信群
-搜索帐号 longerian 获取邀请
+
+![](https://img.alicdn.com/tfs/TB11_2_kbSYBuNjSspiXXXNzpXa-167-167.png)
+
+搜索 `tangram_` 或者扫描以上二维码添加 Tangram 为好友，以便我们邀请你入群。

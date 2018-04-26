@@ -1456,8 +1456,11 @@ public class VirtualLayoutManager extends ExposeLinearLayoutManagerEx implements
     @Override
     public void recycleView(View view) {
         if (mRecyclerView != null) {
-            RecyclerView.ViewHolder holder = mRecyclerView.getChildViewHolder(view);
-            mRecyclerView.getRecycledViewPool().putRecycledView(holder);
+            ViewParent parent = view.getParent();
+            if (parent != null && parent == mRecyclerView) {
+                RecyclerView.ViewHolder holder = mRecyclerView.getChildViewHolder(view);
+                mRecyclerView.getRecycledViewPool().putRecycledView(holder);
+            }
         }
     }
 
