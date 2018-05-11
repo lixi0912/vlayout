@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import bugfix.issue282.Issue282Activity;
+
 /**
  * Created by J!nl!n on 2017/3/9.
  */
@@ -18,7 +20,8 @@ public class RootActivity extends ListActivity {
             MainActivity.class.getSimpleName(),
             TestActivity.class.getSimpleName(),
             OnePlusNLayoutActivity.class.getSimpleName(),
-            DebugActivity.class.getSimpleName()
+            DebugActivity.class.getSimpleName(),
+            Issue282Activity.class.getSimpleName(),
     };
 
     private Class[] mActivities = new Class[]{
@@ -26,7 +29,8 @@ public class RootActivity extends ListActivity {
             MainActivity.class,
             TestActivity.class,
             OnePlusNLayoutActivity.class,
-            DebugActivity.class
+            DebugActivity.class,
+            Issue282Activity.class
     };
 
     @Override

@@ -180,6 +180,8 @@ class ExposeLinearLayoutManagerEx extends LinearLayoutManager {
     }
 
 
+
+
     @Override
     public Parcelable onSaveInstanceState() {
         if (mCurrentPendingSavedState != null) {

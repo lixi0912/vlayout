@@ -51,12 +51,12 @@ public class DebugActivity extends Activity {
         recyclerView.setAdapter(delegateAdapter);
     }
 
-    private static class SubAdapter extends DelegateAdapter.Adapter<SubViewHolder> {
+    public static class SubAdapter extends DelegateAdapter.Adapter<SubViewHolder> {
 
         private LayoutHelper mLayoutHelper;
         private int mItemCount;
 
-        private SubAdapter(LayoutHelper layoutHelper, int itemCount) {
+        public SubAdapter(LayoutHelper layoutHelper, int itemCount) {
             mLayoutHelper = layoutHelper;
             mItemCount = itemCount;
         }
