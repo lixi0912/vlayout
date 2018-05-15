@@ -102,6 +102,7 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
         this.mItemCount = itemCount;
     }
 
+
     /**
      * Retrieve next view and add it into layout, this is to make sure that view are added by order
      *
@@ -166,6 +167,53 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
     }
 
 
+    protected Rect removedViewRect;
+
+    @Override
+    public void onItemsRemoved(RecyclerView recyclerView, LayoutManagerHelper helper, int positionStart, int itemCount) {
+        super.onItemsRemoved(recyclerView, helper, positionStart, itemCount);
+        if (requireAdjustRectByRemovedView(positionStart, itemCount)) {
+            if (!ItemAnimatorCompat.supportAnimator(recyclerView, helper, this, positionStart, itemCount, mLayoutView)) {
+//                if (null != mLayoutView) {
+//                    positionStart++;
+//                }
+//                final Rect removedViewRect = getRemovedViewRect();
+//                final int childCount = recyclerView.getChildCount();
+//                for (int i = 0, pos = positionStart; i < itemCount && i < childCount; i++, pos++) {
+//                    View child = recyclerView.getChildAt(pos);
+//                    if (null != child) {
+//                        removedViewRect
+//                                .union(child.getLeft(), child.getTop(),
+//                                        child.getRight(), child.getBottom());
+//                    }
+//                }
+            }
+        }
+    }
+
+    @NonNull
+    protected Rect getRemovedViewRect() {
+        if (null == removedViewRect) {
+            removedViewRect = new Rect();
+        }
+        return removedViewRect;
+    }
+
+
+    /**
+     * @param positionStart remove item index
+     * @param itemCount     remove item count
+     * @return true
+     */
+    private boolean requireAdjustRectByRemovedView(int positionStart, int itemCount) {
+        return positionStart == 0 && requireLayoutView() && adjustLayoutViewRectByRemovedView(positionStart, itemCount);
+    }
+
+    protected boolean adjustLayoutViewRectByRemovedView(int positionStart, int itemCount) {
+        return true;
+    }
+
+
     @Override
     public void afterLayout(RecyclerView.Recycler recycler, RecyclerView.State state,
                             int startPosition, int endPosition, int scrolled,
@@ -190,6 +238,15 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
                         mLayoutRegion.offset(-scrolled, 0);
                     }
                 }
+                final Rect removedViewRect = getRemovedViewRect();
+                if (!removedViewRect.isEmpty()) {
+                    if (helper.getOrientation() == VirtualLayoutManager.VERTICAL) {
+                        mLayoutRegion.offset(0, -removedViewRect.height());
+                    } else {
+                        mLayoutRegion.offset(-removedViewRect.width(), 0);
+                    }
+                }
+
                 int contentWidth = helper.getContentWidth();
                 int contentHeight = helper.getContentHeight();
                 if (helper.getOrientation() == VirtualLayoutManager.VERTICAL ?
@@ -210,6 +267,7 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
                     }
 
                     bindLayoutView(mLayoutView);
+                    this.removedViewRect = null;
                     return;
                 } else {
                     mLayoutRegion.set(0, 0, 0, 0);
@@ -226,6 +284,7 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
             }
             helper.removeChildView(mLayoutView);
             mLayoutView = null;
+            removedViewRect = null;
         }
 
     }
@@ -244,23 +303,23 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
                         tempRect.setEmpty();
                     } else {
                         final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams)
-                            refer.getLayoutParams();
+                                refer.getLayoutParams();
                         if (helper.getOrientation() == VirtualLayoutManager.VERTICAL) {
                             tempRect.union(helper.getDecoratedLeft(refer) - params.leftMargin,
-                                orientationHelper.getDecoratedStart(refer),
-                                helper.getDecoratedRight(refer) + params.rightMargin,
-                                orientationHelper.getDecoratedEnd(refer));
+                                    orientationHelper.getDecoratedStart(refer),
+                                    helper.getDecoratedRight(refer) + params.rightMargin,
+                                    orientationHelper.getDecoratedEnd(refer));
                         } else {
                             tempRect.union(orientationHelper.getDecoratedStart(refer),
-                                helper.getDecoratedTop(refer) - params.topMargin, orientationHelper.getDecoratedEnd(refer),
-                                helper.getDecoratedBottom(refer) + params.bottomMargin);
+                                    helper.getDecoratedTop(refer) - params.topMargin, orientationHelper.getDecoratedEnd(refer),
+                                    helper.getDecoratedBottom(refer) + params.bottomMargin);
                         }
                     }
                 }
             }
             if (!tempRect.isEmpty()) {
                 mLayoutRegion.set(tempRect.left - mPaddingLeft, tempRect.top - mPaddingTop,
-                    tempRect.right + mPaddingRight, tempRect.bottom + mPaddingBottom);
+                        tempRect.right + mPaddingRight, tempRect.bottom + mPaddingBottom);
             } else {
                 mLayoutRegion.setEmpty();
             }
@@ -396,8 +455,9 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
 
         /**
          * Implement it by maintaining a map between layoutView and image url or setting a unique tag to view. It's up to your choice.
+         *
          * @param layoutView view ready to be binded with an image
-*        * @param id layoutView's identifier
+         *                   * @param id layoutView's identifier
          */
         void onBindViewSuccess(View layoutView, String id);
     }
@@ -412,7 +472,7 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
      * when binding image to it would cause view tree to relayout, then the same  {@link LayoutViewBindListener#onBind(View, BaseLayoutHelper)} would be called.
      * User should provide enough information to tell LayoutHelper whether image has been bind success.
      * If image has been successfully binded , no more dead loop happens.
-     *
+     * <p>
      * Of course you can handle this logic by yourself and ignore this helper.
      */
     public static class DefaultLayoutViewHelper implements LayoutViewBindListener, LayoutViewUnBindListener, LayoutViewHelper {
@@ -421,11 +481,12 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
 
         private final LayoutViewUnBindListener mLayoutViewUnBindListener;
 
+
         public DefaultLayoutViewHelper(
-            LayoutViewBindListener layoutViewBindListener,
-            LayoutViewUnBindListener layoutViewUnBindListener) {
-            mLayoutViewBindListener = layoutViewBindListener;
-            mLayoutViewUnBindListener = layoutViewUnBindListener;
+                LayoutViewBindListener layoutViewBindListener,
+                LayoutViewUnBindListener layoutViewUnBindListener) {
+            this.mLayoutViewBindListener = layoutViewBindListener;
+            this.mLayoutViewUnBindListener = layoutViewUnBindListener;
         }
 
         @Override
@@ -458,6 +519,7 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
 
     /**
      * Better to use {@link #setLayoutViewHelper(DefaultLayoutViewHelper)}
+     *
      * @param bindListener
      */
     public void setLayoutViewBindListener(LayoutViewBindListener bindListener) {
@@ -466,6 +528,7 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
 
     /**
      * Better to use {@link #setLayoutViewHelper(DefaultLayoutViewHelper)}
+     *
      * @param layoutViewUnBindListener
      */
     public void setLayoutViewUnBindListener(
@@ -477,7 +540,7 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
     public void bindLayoutView(@NonNull final View layoutView) {
         layoutView.measure(View.MeasureSpec.makeMeasureSpec(mLayoutRegion.width(), View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(mLayoutRegion.height(), View.MeasureSpec.EXACTLY));
-        layoutView.layout(mLayoutRegion.left, mLayoutRegion.top, mLayoutRegion.right, mLayoutRegion.bottom);
+        layoutView.layout(0, 0, mLayoutRegion.width(), mLayoutRegion.height());
         layoutView.setBackgroundColor(mBgColor);
 
         if (mLayoutViewBindListener != null) {
@@ -507,6 +570,7 @@ public abstract class BaseLayoutHelper extends MarginLayoutHelper {
 
     /**
      * Helper methods to handle focus states for views
+     *
      * @param result
      * @param views
      */

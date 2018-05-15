@@ -180,6 +180,7 @@ public abstract class LayoutHelper {
     /**
      * Experimental attribute, set zIndex of this {@link LayoutHelper}，it does not mean the z-index of view. It just reorder the layoutHelpers in linear flow.
      * Do not use it currently.
+     *
      * @param zIndex
      */
     public void setZIndex(int zIndex) {
@@ -272,11 +273,28 @@ public abstract class LayoutHelper {
 
     /**
      * Run to adjust layoutHelper's background area
+     *
      * @param startPosition
      * @param endPosition
      * @param helper
      */
     public abstract void adjustLayout(int startPosition, int endPosition, LayoutManagerHelper helper);
+
+    public void onItemsAdded(RecyclerView recyclerView, LayoutManagerHelper helper, int positionStart, int itemCount) {
+        onItemsChanged(helper);
+    }
+
+    public void onItemsRemoved(RecyclerView recyclerView, LayoutManagerHelper helper, int positionStart, int itemCount) {
+        onItemsChanged(helper);
+    }
+
+    public void onItemsUpdated(RecyclerView recyclerView, LayoutManagerHelper helper, int positionStart, int itemCount) {
+        onItemsChanged(helper);
+    }
+
+    public void onItemsMoved(RecyclerView recyclerView, LayoutManagerHelper helper, int from, int to, int itemCount) {
+        onItemsChanged(helper);
+    }
 
     public void onItemsChanged(LayoutManagerHelper helper) {
 
@@ -316,19 +334,19 @@ public abstract class LayoutHelper {
      * @return extra offset must be calculated in {@link VirtualLayoutManager}
      */
     public abstract int computeAlignOffset(int offset, boolean isLayoutEnd, boolean useAnchor,
-        LayoutManagerHelper helper);
+                                           LayoutManagerHelper helper);
 
     public abstract int computeMarginStart(int offset, boolean isLayoutEnd, boolean useAnchor,
-        LayoutManagerHelper helper);
+                                           LayoutManagerHelper helper);
 
     public abstract int computeMarginEnd(int offset, boolean isLayoutEnd, boolean useAnchor,
-        LayoutManagerHelper helper);
+                                         LayoutManagerHelper helper);
 
     public abstract int computePaddingStart(int offset, boolean isLayoutEnd, boolean useAnchor,
-        LayoutManagerHelper helper);
+                                            LayoutManagerHelper helper);
 
     public abstract int computePaddingEnd(int offset, boolean isLayoutEnd, boolean useAnchor,
-        LayoutManagerHelper helper);
+                                          LayoutManagerHelper helper);
 
     public void onSaveState(final Bundle bundle) {
 

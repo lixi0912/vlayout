@@ -12,6 +12,7 @@ import com.alibaba.android.vlayout.example.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author 陈晓辉
@@ -34,11 +35,11 @@ public class DynamicAdapter extends RecyclerView.Adapter<DynamicAdapter.ViewHold
 
     private List<String> mList;
 
-    public DynamicAdapter() {
+    DynamicAdapter(AtomicInteger idCreator) {
         final List<String> data = new ArrayList<>();
         final int size = 10;
         for (int i = 0; i < size; i++) {
-            data.add(String.valueOf(i));
+            data.add(String.valueOf(idCreator.incrementAndGet()));
         }
         this.mList = data;
     }

@@ -809,22 +809,38 @@ public class VirtualLayoutManager extends ExposeLinearLayoutManagerEx implements
      */
     @Override
     public void onItemsAdded(RecyclerView recyclerView, int positionStart, int itemCount) {
-        onItemsChanged(recyclerView);
+        List<LayoutHelper> layoutHelpers = mHelperFinder.getLayoutHelpers();
+        for (int i = 0, size = layoutHelpers.size(); i < size; i++) {
+            LayoutHelper layoutHelper = layoutHelpers.get(i);
+            layoutHelper.onItemsAdded(recyclerView, this, positionStart, itemCount);
+        }
     }
 
     @Override
     public void onItemsRemoved(RecyclerView recyclerView, int positionStart, int itemCount) {
-        onItemsChanged(recyclerView);
+        List<LayoutHelper> layoutHelpers = mHelperFinder.getLayoutHelpers();
+        for (int i = 0, size = layoutHelpers.size(); i < size; i++) {
+            LayoutHelper layoutHelper = layoutHelpers.get(i);
+            layoutHelper.onItemsRemoved(recyclerView, this, positionStart, itemCount);
+        }
     }
 
     @Override
     public void onItemsUpdated(RecyclerView recyclerView, int positionStart, int itemCount) {
-        onItemsChanged(recyclerView);
+        List<LayoutHelper> layoutHelpers = mHelperFinder.getLayoutHelpers();
+        for (int i = 0, size = layoutHelpers.size(); i < size; i++) {
+            LayoutHelper layoutHelper = layoutHelpers.get(i);
+            layoutHelper.onItemsUpdated(recyclerView, this, positionStart, itemCount);
+        }
     }
 
     @Override
     public void onItemsMoved(RecyclerView recyclerView, int from, int to, int itemCount) {
-        onItemsChanged(recyclerView);
+        List<LayoutHelper> layoutHelpers = mHelperFinder.getLayoutHelpers();
+        for (int i = 0, size = layoutHelpers.size(); i < size; i++) {
+            LayoutHelper layoutHelper = layoutHelpers.get(i);
+            layoutHelper.onItemsMoved(recyclerView, this, from, to, itemCount);
+        }
     }
 
     @Override
@@ -834,7 +850,6 @@ public class VirtualLayoutManager extends ExposeLinearLayoutManagerEx implements
             LayoutHelper layoutHelper = layoutHelpers.get(i);
             layoutHelper.onItemsChanged(this);
         }
-
         // setLayoutHelpers(mHelperFinder.getLayoutHelpers());
     }
 

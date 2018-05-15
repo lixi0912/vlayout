@@ -31,7 +31,6 @@ import com.alibaba.android.vlayout.VirtualLayoutManager.LayoutParams;
 import com.alibaba.android.vlayout.VirtualLayoutManager.LayoutStateWrapper;
 
 import android.support.annotation.NonNull;
-import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseIntArray;
@@ -212,6 +211,11 @@ public class GridLayoutHelper extends BaseLayoutHelper {
     }
 
     @Override
+    protected boolean adjustLayoutViewRectByRemovedView(int positionStart, int itemCount) {
+        return getSpanCount() == itemCount;
+    }
+
+    @Override
     public void layoutViews(RecyclerView.Recycler recycler, RecyclerView.State state, LayoutStateWrapper layoutState, LayoutChunkResult result, LayoutManagerHelper helper) {
         // reach the end of this layout
         if (isOutOfRange(layoutState.getCurrentPosition())) {
@@ -224,7 +228,7 @@ public class GridLayoutHelper extends BaseLayoutHelper {
 
         final int itemDirection = layoutState.getItemDirection();
         final boolean layingOutInPrimaryDirection =
-            itemDirection == LayoutStateWrapper.ITEM_DIRECTION_TAIL;
+                itemDirection == LayoutStateWrapper.ITEM_DIRECTION_TAIL;
 
         OrientationHelperEx orientationHelper = helper.getMainOrientationHelper();
 
@@ -268,8 +272,8 @@ public class GridLayoutHelper extends BaseLayoutHelper {
                     final int spanSize = getSpanSize(recycler, state, index);
                     if (spanSize > mSpanCount) {
                         throw new IllegalArgumentException("Item at position " + index + " requires " +
-                            spanSize + " spans but GridLayoutManager has only " + mSpanCount
-                            + " spans.");
+                                spanSize + " spans but GridLayoutManager has only " + mSpanCount
+                                + " spans.");
                     }
 
                     View view = layoutState.retrieve(recycler, index);
@@ -319,8 +323,8 @@ public class GridLayoutHelper extends BaseLayoutHelper {
             final int spanSize = getSpanSize(recycler, state, pos);
             if (spanSize > mSpanCount) {
                 throw new IllegalArgumentException("Item at position " + pos + " requires " +
-                    spanSize + " spans but GridLayoutManager has only " + mSpanCount
-                    + " spans.");
+                        spanSize + " spans but GridLayoutManager has only " + mSpanCount
+                        + " spans.");
             }
             remainingSpan -= spanSize;
             if (remainingSpan < 0) {
@@ -424,18 +428,18 @@ public class GridLayoutHelper extends BaseLayoutHelper {
                 spec = View.MeasureSpec.makeMeasureSpec(Math.max(0, spanLength), View.MeasureSpec.EXACTLY);
             } else {
                 spec = View.MeasureSpec.makeMeasureSpec(mSizePerSpan * spanSize +
-                        Math.max(0, spanSize - 1) * (layoutInVertical ? mHGap : mVGap),
-                    View.MeasureSpec.EXACTLY);
+                                Math.max(0, spanSize - 1) * (layoutInVertical ? mHGap : mVGap),
+                        View.MeasureSpec.EXACTLY);
             }
             final VirtualLayoutManager.LayoutParams lp = (VirtualLayoutManager.LayoutParams) view.getLayoutParams();
 
             if (helper.getOrientation() == VERTICAL) {
                 helper.measureChildWithMargins(view, spec, getMainDirSpec(lp.height, mTotalSize,
-                    View.MeasureSpec.getSize(spec), lp.mAspectRatio));
+                        View.MeasureSpec.getSize(spec), lp.mAspectRatio));
             } else {
                 helper.measureChildWithMargins(view,
-                    getMainDirSpec(lp.width, mTotalSize, View.MeasureSpec.getSize(spec),
-                        lp.mAspectRatio), View.MeasureSpec.getSize(spec));
+                        getMainDirSpec(lp.width, mTotalSize, View.MeasureSpec.getSize(spec),
+                                lp.mAspectRatio), View.MeasureSpec.getSize(spec));
             }
             final int size = orientationHelper.getDecoratedMeasurement(view);
             if (size > maxSize) {
@@ -459,8 +463,8 @@ public class GridLayoutHelper extends BaseLayoutHelper {
                     spec = View.MeasureSpec.makeMeasureSpec(Math.max(0, spanLength), View.MeasureSpec.EXACTLY);
                 } else {
                     spec = View.MeasureSpec.makeMeasureSpec(mSizePerSpan * spanSize +
-                            Math.max(0, spanSize - 1) * (layoutInVertical ? mHGap : mVGap),
-                        View.MeasureSpec.EXACTLY);
+                                    Math.max(0, spanSize - 1) * (layoutInVertical ? mHGap : mVGap),
+                            View.MeasureSpec.EXACTLY);
                 }
 
                 if (helper.getOrientation() == VERTICAL) {
@@ -534,7 +538,7 @@ public class GridLayoutHelper extends BaseLayoutHelper {
                     }
                 } else {
                     top = helper.getPaddingTop() + mMarginTop + mPaddingTop
-                        + mSizePerSpan * index + index * mVGap;
+                            + mSizePerSpan * index + index * mVGap;
                 }
 
                 bottom = top + orientationHelper.getDecoratedMeasurementInOther(view);
@@ -542,7 +546,7 @@ public class GridLayoutHelper extends BaseLayoutHelper {
 
             if (DEBUG) {
                 Log.d(TAG, "layout item in position: " + params.getViewPosition() + " with text " + ((TextView) view).getText() + " with SpanIndex: " + index + " into (" +
-                    left + ", " + top + ", " + right + ", " + bottom + " )");
+                        left + ", " + top + ", " + right + ", " + bottom + " )");
             }
 
             // We calculate everything with View's bounding box (which includes decor and margins)

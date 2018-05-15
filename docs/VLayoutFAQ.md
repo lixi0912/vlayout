@@ -68,8 +68,8 @@ RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListen
                     total = recyclerView.getAdapter().getItemCount();
                     if(last > 0
                         && last >= total  - earlyCountForAutoLoad) {
-                        //earlyCountForAutoLoad: help to trigger load more listener earlier
-                        //TODO trigger loadmore listener
+                        //earlyCountForAutoLoad: help to trigger load more bindListener earlier
+                        //TODO trigger loadmore bindListener
                     }
                 }
             }

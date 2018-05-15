@@ -30,6 +30,10 @@ import com.alibaba.android.vlayout.VirtualLayoutManager;
 import com.alibaba.android.vlayout.VirtualLayoutManager.AnchorInfoWrapper;
 import com.alibaba.android.vlayout.VirtualLayoutManager.LayoutParams;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.State;
 import android.util.Log;
@@ -216,6 +220,7 @@ public class LinearLayoutHelper extends BaseLayoutHelper {
         handleStateOnResult(result, view);
         mLayoutWithAnchor = false;
     }
+
 
     @Override
     public void checkAnchorInfo(State state, AnchorInfoWrapper anchorInfo, LayoutManagerHelper helper) {
