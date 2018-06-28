@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.android.vlayout.extend.PerformanceMonitor;
 import com.alibaba.android.vlayout.layout.BaseLayoutHelper;
 import com.alibaba.android.vlayout.layout.DefaultLayoutHelper;
 import com.alibaba.android.vlayout.layout.FixAreaAdjuster;
@@ -67,6 +68,8 @@ import android.view.ViewParent;
 public class VirtualLayoutManager extends ExposeLinearLayoutManagerEx implements LayoutManagerHelper {
     protected static final String TAG = "VirtualLayoutManager";
 
+    private static final String PHASE_MEASURE = "measure";
+    private static final String PHASE_LAYOUT = "layout";
     private static final String TRACE_LAYOUT = "VLM onLayoutChildren";
     private static final String TRACE_SCROLL = "VLM scroll";
 
@@ -90,10 +93,15 @@ public class VirtualLayoutManager extends ExposeLinearLayoutManagerEx implements
 
     private boolean mNestedScrolling = false;
 
+    private boolean mCanScrollHorizontally;
+
+    private boolean mCanScrollVertically;
+
     private boolean mEnableMarginOverlapping = false;
 
     private int mMaxMeasureSize = -1;
 
+    private PerformanceMonitor mPerformanceMonitor;
 
     public VirtualLayoutManager(@NonNull final Context context) {
         this(context, VERTICAL);
@@ -118,15 +126,28 @@ public class VirtualLayoutManager extends ExposeLinearLayoutManagerEx implements
         super(context, orientation, reverseLayout);
         this.mOrientationHelper = OrientationHelperEx.createOrientationHelper(this, orientation);
         this.mSecondaryOrientationHelper = OrientationHelperEx.createOrientationHelper(this, orientation == VERTICAL ? HORIZONTAL : VERTICAL);
+        this.mCanScrollVertically = super.canScrollVertically();
+        this.mCanScrollHorizontally = super.canScrollHorizontally();
         setHelperFinder(new RangeLayoutHelperFinder());
     }
 
+    public void setPerformanceMonitor(PerformanceMonitor performanceMonitor) {
+        mPerformanceMonitor = performanceMonitor;
+    }
 
     public void setNoScrolling(boolean noScrolling) {
         this.mNoScrolling = noScrolling;
         mSpaceMeasured = false;
         mMeasuredFullSpace = 0;
         mSpaceMeasuring = false;
+    }
+
+    public void setCanScrollVertically(boolean canScrollVertically) {
+        this.mCanScrollVertically = canScrollVertically;
+    }
+
+    public void setCanScrollHorizontally(boolean canScrollHorizontally) {
+        this.mCanScrollHorizontally = canScrollHorizontally;
     }
 
     public void setNestedScrolling(boolean nestedScrolling) {
@@ -1256,25 +1277,37 @@ public class VirtualLayoutManager extends ExposeLinearLayoutManagerEx implements
 
     @Override
     public boolean canScrollHorizontally() {
-        return super.canScrollHorizontally() && !mNoScrolling;
+        return mCanScrollHorizontally && !mNoScrolling;
     }
 
     @Override
     public boolean canScrollVertically() {
-        return super.canScrollVertically() && !mNoScrolling;
+        return mCanScrollVertically && !mNoScrolling;
     }
 
     @Override
     public void layoutChildWithMargins(View child, int left, int top, int right, int bottom) {
         final ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) child.getLayoutParams();
+        if (mPerformanceMonitor != null) {
+            mPerformanceMonitor.recordStart(PHASE_LAYOUT, child);
+        }
         layoutDecorated(child, left + lp.leftMargin, top + lp.topMargin,
                 right - lp.rightMargin, bottom - lp.bottomMargin);
+        if (mPerformanceMonitor != null) {
+            mPerformanceMonitor.recordEnd(PHASE_LAYOUT, child);
+        }
     }
 
     @Override
     public void layoutChild(View child, int left, int top, int right, int bottom) {
+        if (mPerformanceMonitor != null) {
+            mPerformanceMonitor.recordStart(PHASE_LAYOUT, child);
+        }
         layoutDecorated(child, left, top,
                 right, bottom);
+        if (mPerformanceMonitor != null) {
+            mPerformanceMonitor.recordEnd(PHASE_LAYOUT, child);
+        }
     }
 
     @Override
@@ -1392,7 +1425,13 @@ public class VirtualLayoutManager extends ExposeLinearLayoutManagerEx implements
         calculateItemDecorationsForChild(child, mDecorInsets);
         widthSpec = updateSpecWithExtra(widthSpec, mDecorInsets.left, mDecorInsets.right);
         heightSpec = updateSpecWithExtra(heightSpec, mDecorInsets.top, mDecorInsets.bottom);
+        if (mPerformanceMonitor != null) {
+            mPerformanceMonitor.recordStart(PHASE_MEASURE, child);
+        }
         child.measure(widthSpec, heightSpec);
+        if (mPerformanceMonitor != null) {
+            mPerformanceMonitor.recordEnd(PHASE_MEASURE, child);
+        }
     }
 
     private void measureChildWithDecorationsAndMargin(View child, int widthSpec, int heightSpec) {
@@ -1407,7 +1446,13 @@ public class VirtualLayoutManager extends ExposeLinearLayoutManagerEx implements
             heightSpec = updateSpecWithExtra(heightSpec, mDecorInsets.top,
                     mDecorInsets.bottom);
         }
+        if (mPerformanceMonitor != null) {
+            mPerformanceMonitor.recordStart(PHASE_MEASURE, child);
+        }
         child.measure(widthSpec, heightSpec);
+        if (mPerformanceMonitor != null) {
+            mPerformanceMonitor.recordEnd(PHASE_MEASURE, child);
+        }
     }
 
     /**
