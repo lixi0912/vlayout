@@ -24,3 +24,4 @@
 
 include ':vlayout'
 include ':examples'
+include 'deploy'
