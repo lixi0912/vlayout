@@ -526,6 +526,9 @@ public class DelegateAdapter extends VirtualLayoutAdapter<RecyclerView.ViewHolde
 
     public Range<Integer> rangeByIndex(int adapterIndex) {
         Pair<AdapterDataObserver, Adapter> rs = mIndexAry.get(adapterIndex);
+        if (null == rs) {
+            return Range.create(0, 0);
+        }
         return Range.create(rs.first.mStartPosition, rs.first.mStartPosition
                 + rs.second.getItemCount());
     }
